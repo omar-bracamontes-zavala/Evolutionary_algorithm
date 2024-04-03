@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 #
 # Evolutivo cosas
 #
-def generate_individual(number_of_particles, dimension):
+def generate_individual(number_of_particles, dimension,box_limits = (-1,1)):
     '''
     Generate a random individual representing a molecule's structure.   
     '''
@@ -86,7 +86,7 @@ def mutate(individual, mutation_rate, mutation_strength=0.1):
             mutation = np.random.uniform(-mutation_strength, mutation_strength)
             individual[i] += mutation
             # For example, if your genes should be in the range [-1, 1], you could use:
-            individual[i] = np.clip(individual[i], -1, 1)
+        #individual[i] = np.clip(individual[i], -10, 10)
     return individual
 
 #
@@ -180,8 +180,10 @@ def evolutionary_algorithm(population_size, number_of_particles, dimension, gene
     return best_fitness_history, best_genomes_history
 
 # Parameters (example values)
+box_limits = (-1,1)
+
 population_size = 100
-number_of_particles = 4
+number_of_particles = 20
 dimension = 3
 generations = 500
 mutation_rate = 0.05
@@ -193,8 +195,12 @@ print("Best Individual:", best_fitness_history[-1])
 print("Best Fitness:", best_genomes_history[-1])
 
 # Plot the best fitness score across generations
-plt.plot(best_fitness_history)
-plt.title('Best Fitness Score over Generations')
-plt.xlabel('Generation')
-plt.ylabel('Best Fitness Score')
-plt.show()
+# plt.plot(best_fitness_history)
+# plt.title('Best Fitness Score over Generations')
+# plt.xlabel('Generation')
+# plt.ylabel('Best Fitness Score')
+# plt.show()
+
+from particles_animation import visualize_particle_system
+print('Finished')
+visualize_particle_system(best_genomes_history, number_of_particles)
