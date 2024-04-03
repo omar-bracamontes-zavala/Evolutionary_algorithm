@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import evolutionary_functions as ef
+from evolutionary_functions import fitness
 
 #
 # Helpers
@@ -49,12 +50,13 @@ def evolutionary_algorithm(
     
     for _ in range(max_generations):
         # Evaluate population
-        fitnesses = evaluate_population(population, dimension)
+        fitnesses = evaluate_population(population, dimension, fitness)
         
         # Log
         _register_best_individual_and_fitness(fitnesses, population, best_fitness_history, best_individuals_history)
         
         # Generate a new population using tournament selection, crossover, and mutation
+        # 
         new_population = []
         while len(new_population) < population_size:
             # Select parents
