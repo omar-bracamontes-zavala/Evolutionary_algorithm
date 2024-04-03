@@ -6,9 +6,9 @@
 import numpy as np
 
 #
-# Main
+# Fitness (Lennard-Jones potential)
 #
-def _particle_lennard_jones(vector_1, vector_2, sigma=1.0, epsilon=1.0):
+def _particle_lennard_jones(vector_1, vector_2, sigma=1.0, epsilon=1.0, penalization_strenght=1e3):
     '''
     vector_1: position vector of the particule 1
     sigma: the zero-potential distance.
@@ -16,8 +16,8 @@ def _particle_lennard_jones(vector_1, vector_2, sigma=1.0, epsilon=1.0):
     '''
     distance = np.linalg.norm(vector_1 - vector_2)
     if distance==0:
-        # Penailzar
-        return 100
+        # Penailzation
+        return penalization_strenght
     return 4 * epsilon * ( (sigma/distance)**12 - (sigma/distance)**6 )
         
 def fitness(molecule, dimension, sigma=1.0, epsilon=1.0):
@@ -52,17 +52,23 @@ def fitness(molecule, dimension, sigma=1.0, epsilon=1.0):
 #
 # These will remain static for the design optimization
 #
-def generate_individual(number_of_particles, dimension, box_limits = (-1,1)):
+def _generate_individual(number_of_particles, dimension, simulation_box_bounds):
     '''
     Generate a random individual representing a molecule's structure.   
     '''
-    return np.random.uniform(low=-1, high=1, size=( number_of_particles * dimension ))
+    return np.random.uniform(
+        low=simulation_box_bounds[0],
+        high=simulation_box_bounds[1],
+        size=( number_of_particles * dimension )
+    )
 
-def initialize_population(population_size, number_of_particles, dimension):
+def initialize_population(population_size, number_of_particles, dimension, simulation_box_bounds):
     """
     Initialize a population of random individuals.
     """
-    return [generate_individual(number_of_particles, dimension) for _ in range(population_size)]
+    return [
+        _generate_individual(number_of_particles, dimension, simulation_box_bounds) for _ in range(population_size)
+    ]
 
 def evaluate_population(population, dimension, fitness):
     """
@@ -93,7 +99,7 @@ def tournament_selection(population, fitnesses, tournament_size=3):
     return population[winner_idx]
 
 #
-# Crossover (function naming rule: <crossover_strategy>_crossover )
+# Crossover ( <crossover_strategy>_crossover )
 #
 def uniform_crossover(parent1, parent2):
     """
@@ -117,7 +123,7 @@ def uniform_crossover(parent1, parent2):
     return offspring1, offspring2
 
 #
-# Mutation (function naming rule: <mutation_strategy>_mutation )
+# Mutation ( <mutation_strategy>_mutation )
 #
 def add_perturbation_mutation(individual, mutation_rate, mutation_strength=0.1):
     """
@@ -141,6 +147,9 @@ def add_perturbation_mutation(individual, mutation_rate, mutation_strength=0.1):
     return individual
 
 
+#
+# For an easier implementation on design
+#
 available_functions = {
     'selection': [
         tournament_selection,
