@@ -4,47 +4,63 @@
 '''
 
 import numpy as np
+from numba import jit, njit, prange
 
 #
 # Fitness (Lennard-Jones potential)
 #
-def _particle_lennard_jones(vector_1, vector_2, sigma=1.0, epsilon=1.0, penalization_strenght=1e3):
+@jit(nopython=True)
+def _particle_lennard_jones_optimized(distances, sigma=1.0, epsilon=1.0, penalization_strength=1e3):
     '''
-    vector_1: position vector of the particule 1
-    sigma: the zero-potential distance.
-    epsilon: the depth of the potential well
+    Calculate the Lennard-Jones potential for a matrix of distances.
+    This function is vectorized for efficiency and uses Numba for JIT compilation.
+
+    Parameters:
+        distances (numpy.ndarray): Matrix of distances between particles.
+        sigma (float): The zero-potential distance.
+        epsilon (float): The depth of the potential well.
+
+    Returns:
+        numpy.ndarray: Matrix of Lennard-Jones potentials.
     '''
-    distance = np.linalg.norm(vector_1 - vector_2)
-    if distance==0:
-        # Penailzation
-        return penalization_strenght
-    return 4 * epsilon * ( (sigma/distance)**12 - (sigma/distance)**6 )
-        
+    # Precompute to avoid division by zero
+    sigma_over_distance = np.where(distances != 0, sigma / distances, 0)
+    sigma_over_distance_6 = sigma_over_distance ** 6
+    sigma_over_distance_12 = sigma_over_distance_6 ** 2
+    potentials = 4 * epsilon * (sigma_over_distance_12 - sigma_over_distance_6)
+
+    # Apply penalization for zero distances
+    # Using np.where is compatible with Numba and avoids manual loop to handle NaN or inf values
+    potentials = np.where(np.isnan(potentials) | np.isinf(potentials), penalization_strength, potentials)
+
+    return potentials
+
+@jit(nopython=True)
 def fitness(molecule, dimension, sigma=1.0, epsilon=1.0):
     """
-    Calculate the total Lennard-Jones potential energy of a molecule.
+    Calculate the total Lennard-Jones potential energy of a molecule using optimized operations and JIT compilation with Numba.
 
     Parameters:
         molecule (numpy.ndarray): Flattened array of particle coordinates.
         dimension (int): The dimensionality of the space (e.g., 3 for three-dimensional space).
-        sigma (float): Distance at which the potential is zero (collision diameter).
+        sigma (float): Distance at which the potential is zero.
         epsilon (float): Depth of the potential well.
 
     Returns:
         float: Total Lennard-Jones potential energy of the molecule.
     """
-    total_energy = 0.0
     num_particles = len(molecule) // dimension
+    reshaped_molecule = molecule.reshape(num_particles, dimension)
 
-    for i in range(num_particles):
-        for j in range(i + 1, num_particles):  # Avoid counting pairs twice
-            # Extract particle coordinates from the flattened array
-            particle_i = molecule[i * dimension:(i + 1) * dimension]
-            particle_j = molecule[j * dimension:(j + 1) * dimension]
+    # Efficiently compute the matrix of distances between all pairs of particles
+    diff = reshaped_molecule[:, np.newaxis, :] - reshaped_molecule[np.newaxis, :, :]
+    distances = np.sqrt(np.sum(diff**2, axis=-1))
 
-            # Calculate and sum the pairwise Lennard-Jones potential
-            interaction_energy = _particle_lennard_jones(particle_i, particle_j, sigma, epsilon)
-            total_energy += interaction_energy
+    # Calculate the pairwise Lennard-Jones potential
+    potentials = _particle_lennard_jones_optimized(distances, sigma, epsilon)
+
+    # Sum over the upper triangle, excluding the diagonal, to avoid double-counting pairs
+    total_energy = np.sum(np.triu(potentials, k=1))
 
     return total_energy
 
@@ -52,29 +68,48 @@ def fitness(molecule, dimension, sigma=1.0, epsilon=1.0):
 #
 # These will remain static for the design optimization
 #
+@njit
 def _generate_individual(number_of_particles, dimension, simulation_box_bounds):
-    '''
-    Generate a random individual representing a molecule's structure.   
-    '''
+    """
+    Generate a random individual representing a molecule's structure.
+    """
     return np.random.uniform(
         low=simulation_box_bounds[0],
         high=simulation_box_bounds[1],
-        size=( number_of_particles * dimension )
+        size=(number_of_particles * dimension)
     )
 
+@njit
 def initialize_population(population_size, number_of_particles, dimension, simulation_box_bounds):
     """
     Initialize a population of random individuals.
     """
-    return [
-        _generate_individual(number_of_particles, dimension, simulation_box_bounds) for _ in range(population_size)
-    ]
+    population = np.empty((population_size, number_of_particles * dimension))
+    for i in range(population_size):
+        population[i] = _generate_individual(number_of_particles, dimension, simulation_box_bounds)
+    return population
 
-def evaluate_population(population, dimension, fitness):
+@jit(nopython=True, parallel=True)
+def evaluate_population(population, dimension, fitness_function_jitted):
     """
-    Evaluate the fitness of each individual in the population.
+    Evaluate the fitness of each individual in the population using JIT compilation and parallel execution.
+
+    Parameters:
+        population (list of numpy.ndarray): The population to evaluate.
+        dimension (int): The dimensionality of the space (e.g., 3 for three-dimensional space).
+        fitness_function_jitted (function): A JIT-compiled fitness function that calculates the fitness of an individual.
+
+    Returns:
+        numpy.ndarray: An array containing the fitness of each individual in the population.
     """
-    return [fitness(individual, dimension) for individual in population]
+    # Preallocate an array for fitness values
+    fitness_values = np.empty(len(population), dtype=np.float64)
+
+    # Parallel loop through the population
+    for i in prange(len(population)):
+        fitness_values[i] = fitness_function_jitted(population[i], dimension)
+
+    return fitness_values
 
 #
 # Parent Selection (<selection_strategy>_selection)
@@ -101,6 +136,7 @@ def tournament_selection(population, fitnesses, tournament_size=3):
 #
 # Crossover ( <crossover_strategy>_crossover )
 #
+@njit
 def uniform_crossover(parent1, parent2):
     """
     Perform uniform crossover between two parents to produce two offspring.
@@ -125,6 +161,7 @@ def uniform_crossover(parent1, parent2):
 #
 # Mutation ( <mutation_strategy>_mutation )
 #
+@njit
 def add_perturbation_mutation(individual, mutation_rate, mutation_strength=0.1):
     """
     Mutate an individual's genes with a given mutation rate.
@@ -142,10 +179,53 @@ def add_perturbation_mutation(individual, mutation_rate, mutation_strength=0.1):
     for i in range(len(individual)):
         if np.random.rand() < mutation_rate:
             # Apply a small, random change
-            mutation = np.random.uniform(-mutation_strength, mutation_strength)
-            individual[i] += mutation
+            individual[i] +=  np.random.uniform(-mutation_strength, mutation_strength)
     return individual
 
+#
+# Generate new population ( <generate_new_population_strategy>_generate_new_population )
+#
+def replace_all_generate_new_population(select_parents, crossover, mutate, population, fitnesses, population_size, mutation_rate, dimension):
+    new_population = []
+    while len(new_population) < population_size:
+        # Select parents
+        parent1 = select_parents(population, fitnesses)
+        parent2 = select_parents(population, fitnesses)
+        # Ensure parent2 is different from parent1
+        while np.array_equal(parent1, parent2):
+            parent2 = select_parents(population, fitnesses)
+        # Crossover
+        offspring1, offspring2 = crossover(parent1, parent2)
+        # Mutate
+        offspring1 = mutate(offspring1, mutation_rate, dimension)
+        offspring2 = mutate(offspring2, mutation_rate, dimension)
+        # Here we ensure the new population does not exceed the intended population size
+        # This is necessary since we're adding two offspring at a time
+        if len(new_population) < population_size:
+            new_population.append(offspring1)
+        if len(new_population) < population_size:
+            new_population.append(offspring2)
+    return new_population
+
+def elitism_mixed_generate_new_population(select_parents, crossover, mutate, population, fitnesses, population_size, mutation_rate, dimension, elitism_rate=0.1):
+    num_elites = int(population_size * elitism_rate)
+    elite_indices = np.argsort(fitnesses)[-num_elites:]
+    new_population = np.empty((population_size, dimension), dtype=population.dtype)  # Assuming population is a 2D array
+    new_population[:num_elites] = population[elite_indices]
+    
+    current_size = num_elites
+    while current_size < population_size:
+        parent1, parent2 = select_parents(population, fitnesses, current_size, dimension)
+        offspring1, offspring2 = crossover(parent1, parent2)
+        offspring1 = mutate(offspring1, mutation_rate, dimension)
+        offspring2 = mutate(offspring2, mutation_rate, dimension)
+        new_population[current_size] = offspring1
+        current_size += 1
+        if current_size < population_size:
+            new_population[current_size] = offspring2
+            current_size += 1
+    
+    return new_population
 
 #
 # For an easier implementation on design
@@ -160,4 +240,16 @@ available_functions = {
     'mutation': [
         add_perturbation_mutation,
     ],
+    'generate_new_population': [
+        replace_all_generate_new_population,
+    ],
 }
+
+if __name__=='__main__':
+    from time import time
+    a = _generate_individual(100, 3, [-10,10])
+    
+    start = time()
+    b = fitness(a, 3)
+    print( time()-start )
+    print(b)

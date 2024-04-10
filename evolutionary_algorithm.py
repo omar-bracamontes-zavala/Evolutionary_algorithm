@@ -26,11 +26,13 @@ def _register_best_individual_and_fitness(fitnesses, population, best_fitness_hi
 #
 def evolutionary_algorithm(
         # Main functions
+        fitness,
         initialize_population,
         evaluate_population,
         select_parents,
         crossover,
         mutate,
+        generate_new_population,
         # Algorithm Hyperparameters
         population_size,
         number_of_particles,
@@ -38,7 +40,7 @@ def evolutionary_algorithm(
         max_generations,
         mutation_rate,
         # Hyperparameters
-        simulation_box_bounds,
+        simulation_box_bounds=[-10,10],
     ):
     """
     Main evolutionary algorithm.
@@ -55,29 +57,22 @@ def evolutionary_algorithm(
         # Log
         _register_best_individual_and_fitness(fitnesses, population, best_fitness_history, best_individuals_history)
         
-        # Generate a new population using tournament selection, crossover, and mutation
-        # 
-        new_population = []
-        while len(new_population) < population_size:
-            # Select parents
-            parent1 = select_parents(population, fitnesses)
-            parent2 = select_parents(population, fitnesses)
-            # Ensure parent2 is different from parent1
-            while np.array_equal(parent1, parent2):
-                parent2 = select_parents(population, fitnesses)
-            # Crossover
-            offspring1, offspring2 = crossover(parent1, parent2)
-            # Mutate
-            offspring1 = mutate(offspring1, mutation_rate, dimension)
-            offspring2 = mutate(offspring2, mutation_rate, dimension)
-            new_population.extend([offspring1, offspring2])
-        
-        population = new_population[:population_size]
+        # Generate a new population
+        population = generate_new_population(
+            select_parents,
+            crossover,
+            mutate,
+            population,
+            fitnesses,
+            population_size,
+            mutation_rate,
+            dimension
+        )
         
         # Optionally, here you can implement elitism to directly pass the best individual(s) to the next generation
         
     # Final evaluation to find the best solution
-    final_fitnesses = evaluate_population(population, dimension)
+    final_fitnesses = evaluate_population(population, dimension, fitness)
     
     # Log
     _register_best_individual_and_fitness(final_fitnesses, population, best_fitness_history, best_individuals_history)
@@ -85,24 +80,28 @@ def evolutionary_algorithm(
     return best_fitness_history, best_individuals_history
 
 if __name__=='__main__':
+    from time import time
+    start = time()
     
+    # Design
     initialize_population = ef.initialize_population
     evaluate_population = ef.evaluate_population
     select_parents = ef.tournament_selection
     crossover = ef.uniform_crossover
     mutate = ef.add_perturbation_mutation
+    generate_new_population = ef.replace_all_generate_new_population#replace_all_generate_new_population
     
     # Parameters (example values)
-    simulation_box_limits = (-1,1)
     population_size = 100
-    number_of_particles = 20
+    number_of_particles = 30
     dimension = 3
-    max_generations = 500
+    max_generations = 5000
     mutation_rate = 0.05
 
     # Run the algorithm
     best_fitness_history, best_individuals_history = evolutionary_algorithm(
         # Main functions
+        fitness=fitness,
         initialize_population=initialize_population,
         evaluate_population=evaluate_population,
         select_parents=select_parents,
@@ -114,21 +113,21 @@ if __name__=='__main__':
         dimension=dimension,
         max_generations=max_generations,
         mutation_rate=mutation_rate,
+        generate_new_population=generate_new_population,
         # Hyperparameters
-        simulation_box_bounds=simulation_box_limits,
     )
-    
+    print('Runtime: ',time()-start,'s' )
     print('Particles: ', number_of_particles)
     print("Best Individual:", best_fitness_history[-1])
-    print("Best Fitness:", best_individuals_history[-1])
+    # print("Best Fitness:", best_individuals_history[-1])
 
     # Plot the best fitness score across generations
-    # plt.plot(best_fitness_history)
-    # plt.title('Best Fitness Score over Generations')
-    # plt.xlabel('Generation')
-    # plt.ylabel('Best Fitness Score')
-    # plt.show()
+    plt.plot(best_fitness_history)
+    plt.title('Best Fitness Score over Generations')
+    plt.xlabel('Generation')
+    plt.ylabel('Best Fitness Score')
+    plt.show()
 
-    from particles_animation import visualize_particle_system
+    # from particles_animation import visualize_particle_system
     print('Finished')
-    visualize_particle_system(best_individuals_history, number_of_particles)
+    # visualize_particle_system(best_individuals_history, number_of_particles)
