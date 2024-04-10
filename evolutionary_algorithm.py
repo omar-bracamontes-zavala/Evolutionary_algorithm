@@ -93,10 +93,11 @@ if __name__=='__main__':
     
     # Parameters (example values)
     population_size = 100
-    number_of_particles = 30
+    number_of_particles = 10
     dimension = 3
     max_generations = 5000
-    mutation_rate = 0.05
+    mutation_rate = 0.01
+    mutation_strength = 1. # this could has an adaptative control 
 
     # Run the algorithm
     best_fitness_history, best_individuals_history = evolutionary_algorithm(
@@ -128,6 +129,6 @@ if __name__=='__main__':
     plt.ylabel('Best Fitness Score')
     plt.show()
 
-    # from particles_animation import visualize_particle_system
+    from particles_animation import visualize_particle_system
     print('Finished')
-    # visualize_particle_system(best_individuals_history,best_fitness_history,number_of_particles)
+    visualize_particle_system(best_individuals_history,best_fitness_history,number_of_particles)

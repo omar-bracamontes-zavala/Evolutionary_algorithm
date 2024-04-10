@@ -15,9 +15,9 @@ def plotting_plane_style(ax_object):
     ax_object.set_xticks([])  
     ax_object.set_yticks([]) 
     ax_object.set_zticks([]) 
-    ax_object.w_xaxis.line.set_color((1.0, 1.0, 1.0, 0.9))
-    ax_object.w_yaxis.line.set_color((1.0, 1.0, 1.0, 0.9))
-    ax_object.w_zaxis.line.set_color((1.0, 1.0, 1.0, 0.9))
+    ax_object.xaxis.line.set_color((1.0, 1.0, 1.0, 0.9))
+    ax_object.yaxis.line.set_color((1.0, 1.0, 1.0, 0.9))
+    ax_object.zaxis.line.set_color((1.0, 1.0, 1.0, 0.9))
     return ax_object
 
 def set_box_limits(ax_object,final_configuration,limits_scheme = 'fit_final'):

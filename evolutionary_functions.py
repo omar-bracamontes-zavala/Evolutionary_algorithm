@@ -185,7 +185,7 @@ def add_perturbation_mutation(individual, mutation_rate, mutation_strength=0.1):
 #
 # Generate new population ( <generate_new_population_strategy>_generate_new_population )
 #
-def replace_all_generate_new_population(select_parents, crossover, mutate, population, fitnesses, population_size, mutation_rate, dimension):
+def replace_all_generate_new_population(select_parents, crossover, mutate, population, fitnesses, population_size, mutation_rate, dimension, mutation_strength):
     new_population = []
     while len(new_population) < population_size:
         # Select parents
@@ -197,8 +197,8 @@ def replace_all_generate_new_population(select_parents, crossover, mutate, popul
         # Crossover
         offspring1, offspring2 = crossover(parent1, parent2)
         # Mutate
-        offspring1 = mutate(offspring1, mutation_rate, dimension)
-        offspring2 = mutate(offspring2, mutation_rate, dimension)
+        offspring1 = mutate(offspring1, mutation_rate, dimension, mutation_strength)
+        offspring2 = mutate(offspring2, mutation_rate, dimension, mutation_strength)
         # Here we ensure the new population does not exceed the intended population size
         # This is necessary since we're adding two offspring at a time
         if len(new_population) < population_size:
@@ -207,25 +207,6 @@ def replace_all_generate_new_population(select_parents, crossover, mutate, popul
             new_population.append(offspring2)
     return new_population
 
-def elitism_mixed_generate_new_population(select_parents, crossover, mutate, population, fitnesses, population_size, mutation_rate, dimension, elitism_rate=0.1):
-    num_elites = int(population_size * elitism_rate)
-    elite_indices = np.argsort(fitnesses)[-num_elites:]
-    new_population = np.empty((population_size, dimension), dtype=population.dtype)  # Assuming population is a 2D array
-    new_population[:num_elites] = population[elite_indices]
-    
-    current_size = num_elites
-    while current_size < population_size:
-        parent1, parent2 = select_parents(population, fitnesses, current_size, dimension)
-        offspring1, offspring2 = crossover(parent1, parent2)
-        offspring1 = mutate(offspring1, mutation_rate, dimension)
-        offspring2 = mutate(offspring2, mutation_rate, dimension)
-        new_population[current_size] = offspring1
-        current_size += 1
-        if current_size < population_size:
-            new_population[current_size] = offspring2
-            current_size += 1
-    
-    return new_population
 
 #
 # For an easier implementation on design
