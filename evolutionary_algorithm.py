@@ -39,6 +39,7 @@ def evolutionary_algorithm(
         dimension,
         max_generations,
         mutation_rate,
+        mutation_strength,
         # Hyperparameters
         simulation_box_initial_length=10,
     ):
@@ -66,7 +67,8 @@ def evolutionary_algorithm(
             fitnesses,
             population_size,
             mutation_rate,
-            dimension
+            dimension,
+            mutation_strength
         )
         
         # Optionally, here you can implement elitism to directly pass the best individual(s) to the next generation
@@ -98,6 +100,7 @@ if __name__=='__main__':
     max_generations = 5000
     mutation_rate = 0.01
     mutation_strength = 1. # this could has an adaptative control 
+    
 
     # Run the algorithm
     best_fitness_history, best_individuals_history = evolutionary_algorithm(
@@ -115,6 +118,7 @@ if __name__=='__main__':
         max_generations=max_generations,
         mutation_rate=mutation_rate,
         generate_new_population=generate_new_population,
+        mutation_strength=mutation_strength,
         # Hyperparameters
     )
     print('Runtime: ',time()-start,'s' )
