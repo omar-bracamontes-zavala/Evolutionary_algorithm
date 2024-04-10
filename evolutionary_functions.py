@@ -24,14 +24,15 @@ def _particle_lennard_jones_optimized(distances, sigma=1.0, epsilon=1.0, penaliz
         numpy.ndarray: Matrix of Lennard-Jones potentials.
     '''
     # Precompute to avoid division by zero
-    sigma_over_distance = np.where(distances != 0, sigma / distances, 0)
+    sigma_over_distance = np.where(distances != 0, sigma / distances, penalization_strength) # penaliza las particulas en la misma posicion pero no hace que se vaya a inf para ahorrar memoria (?)
+    sigma_over_distance = np.where(distances > 2*sigma, sigma / distances, 0) # penaliza ligeramente las particulas que estan 'muy' lejos
     sigma_over_distance_6 = sigma_over_distance ** 6
     sigma_over_distance_12 = sigma_over_distance_6 ** 2
     potentials = 4 * epsilon * (sigma_over_distance_12 - sigma_over_distance_6)
 
     # Apply penalization for zero distances
     # Using np.where is compatible with Numba and avoids manual loop to handle NaN or inf values
-    potentials = np.where(np.isnan(potentials) | np.isinf(potentials), penalization_strength, potentials)
+    potentials = np.where(np.isnan(potentials) | np.isinf(potentials) , penalization_strength, potentials)
 
     return potentials
 
@@ -197,8 +198,8 @@ def replace_all_generate_new_population(select_parents, crossover, mutate, popul
         # Crossover
         offspring1, offspring2 = crossover(parent1, parent2)
         # Mutate
-        offspring1 = mutate(offspring1, mutation_rate, dimension, mutation_strength)
-        offspring2 = mutate(offspring2, mutation_rate, dimension, mutation_strength)
+        offspring1 = mutate(offspring1, mutation_rate, mutation_strength)
+        offspring2 = mutate(offspring2, mutation_rate, mutation_strength)
         # Here we ensure the new population does not exceed the intended population size
         # This is necessary since we're adding two offspring at a time
         if len(new_population) < population_size:

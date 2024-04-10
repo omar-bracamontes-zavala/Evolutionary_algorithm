@@ -36,11 +36,11 @@ def evolutionary_algorithm(
         # Algorithm Hyperparameters
         population_size,
         number_of_particles,
-        dimension,
         max_generations,
         mutation_rate,
         mutation_strength,
         # Hyperparameters
+        dimension=3,
         simulation_box_initial_length=10,
     ):
     """
@@ -95,8 +95,7 @@ if __name__=='__main__':
     
     # Parameters (example values)
     population_size = 100
-    number_of_particles = 10
-    dimension = 3
+    number_of_particles = 30
     max_generations = 5000
     mutation_rate = 0.01
     mutation_strength = 1. # this could has an adaptative control 
@@ -114,7 +113,6 @@ if __name__=='__main__':
         # Algorithm Hyperparameters
         population_size=population_size,
         number_of_particles=number_of_particles,
-        dimension=dimension,
         max_generations=max_generations,
         mutation_rate=mutation_rate,
         generate_new_population=generate_new_population,
@@ -123,7 +121,7 @@ if __name__=='__main__':
     )
     print('Runtime: ',time()-start,'s' )
     print('Particles: ', number_of_particles)
-    print("Best Individual:", best_fitness_history[-1])
+    print("Energy:", best_fitness_history[-1])
     # print("Best Fitness:", best_individuals_history[-1])
 
     # Plot the best fitness score across generations
