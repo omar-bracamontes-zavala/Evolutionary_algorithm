@@ -61,7 +61,20 @@ def initialize_plotting_elements(axes_object,vectors,dimensions,number_of_partic
     time_text = axes_object.text2D(0.00, 0.95, '', transform=axes_object.transAxes)
     return scatter_object, lines, time_text
 
-def visualize_particle_system(vectors, energies, number_of_particles, filename='particle_animation.gif',dimensions=3):
+def visualize_particle_system(vectors, energies, number_of_particles, filename='particle_animation.gif',dimensions=3, save_as_gif=False,showtime=20,gif_fps=60):
+    '''
+    Function for visualizing spacial configuration of particles during evolutive search.
+    input:
+        vectors (array): List of the position vectors that were the best fitness at each generation.
+        energies (array): List of the corresponding energies of the best fitness individuals at each generation.
+        number_of_particles (int): Total number of particles used.
+        filename (str): Name to which save the gif of the animation.
+        save_as_gif (bool): Option to save animation as gif after showing.
+        showtime (int): Number of seconds for the in-console visualization. For small showtime values, animation speed might be bounded by computing speed.
+        gif_fps(int): Frames per second for the final gif in case it is saved.
+    returns None
+    '''
+    
     ### Create the plot canvas
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
@@ -89,6 +102,8 @@ def visualize_particle_system(vectors, energies, number_of_particles, filename='
 
         return [scatter_object, *lines, time_text]
 
-    anim = FuncAnimation(fig, update, frames=len(vectors), interval=50, blit=False)
+    delay_in_ms = (showtime*1000)//(len(vectors)//dimensions) # to get the delay in ms between frames
+    anim = FuncAnimation(fig, update, frames=len(vectors), interval=delay_in_ms, blit=False)
     plt.show()
-    #anim.save('tst.gif', writer='pillow', fps=24)
+    if save_as_gif:
+        anim.save(filename, writer='pillow', fps=gif_fps)
