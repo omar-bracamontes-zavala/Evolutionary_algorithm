@@ -66,7 +66,7 @@ def visualize_particle_system(vectors, energies, number_of_particles, filename='
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.set_title('Best individual configuration')
-    normalizer,colormap = create_colormap(energies,vmin= -12.71,vmax=10) 
+    normalizer,colormap = create_colormap(energies,vmin= None,vmax=10) 
     
     # some styling
     ax = plotting_plane_style(ax)
@@ -89,6 +89,6 @@ def visualize_particle_system(vectors, energies, number_of_particles, filename='
 
         return [scatter_object, *lines, time_text]
 
-    anim = FuncAnimation(fig, update, frames=len(vectors), interval=100, blit=False)
+    anim = FuncAnimation(fig, update, frames=len(vectors), interval=50, blit=False)
     plt.show()
     #anim.save('tst.gif', writer='pillow', fps=24)

@@ -40,13 +40,13 @@ def evolutionary_algorithm(
         max_generations,
         mutation_rate,
         # Hyperparameters
-        simulation_box_bounds=[-10,10],
+        simulation_box_initial_length=10,
     ):
     """
     Main evolutionary algorithm.
     """
     # Initialize population
-    population = initialize_population(population_size, number_of_particles, dimension, simulation_box_bounds)
+    population = initialize_population(population_size, number_of_particles, dimension, simulation_box_initial_length)
     best_fitness_history = []
     best_individuals_history = []
     
@@ -130,4 +130,4 @@ if __name__=='__main__':
 
     # from particles_animation import visualize_particle_system
     print('Finished')
-    # visualize_particle_system(best_individuals_history, number_of_particles)
+    # visualize_particle_system(best_individuals_history,best_fitness_history,number_of_particles)

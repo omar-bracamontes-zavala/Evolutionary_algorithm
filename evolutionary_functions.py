@@ -69,24 +69,24 @@ def fitness(molecule, dimension, sigma=1.0, epsilon=1.0):
 # These will remain static for the design optimization
 #
 @njit
-def _generate_individual(number_of_particles, dimension, simulation_box_bounds):
+def _generate_individual(number_of_particles, dimension, simulation_box_initial_length):
     """
     Generate a random individual representing a molecule's structure.
     """
     return np.random.uniform(
-        low=simulation_box_bounds[0],
-        high=simulation_box_bounds[1],
+        low=0,
+        high=simulation_box_initial_length,
         size=(number_of_particles * dimension)
     )
 
 @njit
-def initialize_population(population_size, number_of_particles, dimension, simulation_box_bounds):
+def initialize_population(population_size, number_of_particles, dimension, simulation_box_initial_length):
     """
     Initialize a population of random individuals.
     """
     population = np.empty((population_size, number_of_particles * dimension))
     for i in range(population_size):
-        population[i] = _generate_individual(number_of_particles, dimension, simulation_box_bounds)
+        population[i] = _generate_individual(number_of_particles, dimension, simulation_box_initial_length)
     return population
 
 @jit(nopython=True, parallel=True)
