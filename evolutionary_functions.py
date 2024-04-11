@@ -10,7 +10,7 @@ from numba import jit, njit, prange
 # Fitness (Lennard-Jones potential)
 #
 @jit(nopython=True)
-def _particle_lennard_jones_optimized(distances, sigma=1.0, epsilon=1.0, penalization_strength=1e3):
+def _particle_lennard_jones_optimized(distances, sigma=1.0, epsilon=1.0, penalization_strength=1e10):
     '''
     Calculate the Lennard-Jones potential for a matrix of distances.
     This function is vectorized for efficiency and uses Numba for JIT compilation.
@@ -23,9 +23,8 @@ def _particle_lennard_jones_optimized(distances, sigma=1.0, epsilon=1.0, penaliz
     Returns:
         numpy.ndarray: Matrix of Lennard-Jones potentials.
     '''
-    # Precompute to avoid division by zero
     sigma_over_distance = np.where(distances != 0, sigma / distances, penalization_strength) # penaliza las particulas en la misma posicion pero no hace que se vaya a inf para ahorrar memoria (?)
-    sigma_over_distance = np.where(distances > 2*sigma, sigma / distances, 0) # penaliza ligeramente las particulas que estan 'muy' lejos
+    # sigma_over_distance = np.where(distances < 2*sigma, sigma / distances, 0) # penaliza ligeramente las particulas que estan 'muy' lejos
     sigma_over_distance_6 = sigma_over_distance ** 6
     sigma_over_distance_12 = sigma_over_distance_6 ** 2
     potentials = 4 * epsilon * (sigma_over_distance_12 - sigma_over_distance_6)

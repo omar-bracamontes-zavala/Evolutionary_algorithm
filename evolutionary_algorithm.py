@@ -41,7 +41,7 @@ def evolutionary_algorithm(
         mutation_strength,
         # Hyperparameters
         dimension=3,
-        simulation_box_initial_length=10,
+        simulation_box_initial_length=1.,
     ):
     """
     Main evolutionary algorithm.
@@ -95,7 +95,7 @@ if __name__=='__main__':
     
     # Parameters (example values)
     population_size = 100
-    number_of_particles = 30
+    number_of_particles = 11
     max_generations = 5000
     mutation_rate = 0.01
     mutation_strength = 1. # this could has an adaptative control 
