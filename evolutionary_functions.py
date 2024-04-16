@@ -172,23 +172,27 @@ def fps_selection(population, fitnesses, num_parents=2):
 # Ranking selection pagina 82
 def ranking_selection(population, fitnesses, s=1.5,  num_parents=2):
     '''
+    Selects parents based on linear ranking of fitness.
+    
     Parameters:
-        population (list of numpy.ndarray): The current population. Note: individuals are also np array
-        fitnesses (list of numpy.ndarray): The fitness of each individual in the population.
+        population (list of numpy.ndarray): The current population.
+        fitnesses (list of float): The fitness of each individual in the population.
+        s (float): Selection pressure, a parameter to adjust the probability distribution.
+        num_parents (int): Number of parents to select.
     '''
     population_size = len(population)
         
-    # Sort the population and fitnesses by descending fitness
-    sorted_indices = np.argsort(fitnesses)[::-1]  # This gets indices to sort array in descending order
-    sorted_population = np.array(population)[sorted_indices]
-    print(sorted_indices)
+    # Get indices that would sort the array, no need to reverse the order
+    sorted_indices = np.argsort(fitnesses)  
 
     # Calculate probabilities based on linear ranking
-    probabilities = np.array([(2-s)/population_size + 2*i*(s-1)/(population_size*(population_size-1)) for i in range(population_size)])
+    ranks = np.arange(1, population_size + 1)  # Ranks from 1 to N
+    probabilities = (2 - s) / population_size + 2 * (ranks - 1) * (s - 1) / (population_size * (population_size - 1))
+    probabilities = probabilities[sorted_indices]  # Reorder probabilities to match sorted indices
 
-    # Select the parents based on probabilities
+    # Select the parents based on these probabilities
     selected_indices = np.random.choice(population_size, size=num_parents, replace=False, p=probabilities)
-    selected_parents = sorted_population[selected_indices]
+    selected_parents = [population[i] for i in selected_indices]
 
     return selected_parents
     
@@ -405,26 +409,25 @@ def genitor_replacement(select_parents, crossover, mutate, population, fitnesses
     '''
     Replace worst  (tha half)
     '''
+    # Convert to numpy array if not already (avoid this if already handled outside this function)
+    population = np.array(population) if not isinstance(population, np.ndarray) else population
+
     # Sort the population by fitness in ascending order (for minimization)
     sorted_indices = np.argsort(fitnesses)
-    sorted_population = np.array(population)[sorted_indices]
+    sorted_population = population[sorted_indices]
 
-    # Split the population into the better and worse parts
-    replacement_num = int(population_size*lambda_ratio)
+    # Split the population into the better and worse halves
+    replacement_num = int(population_size * lambda_ratio)
     better_half = sorted_population[:replacement_num]
     worse_half = sorted_population[replacement_num:]
-    
+
     # Generate new offspring to replace the worse half
     new_offspring = []
     while len(new_offspring) < len(worse_half):
-        # Select parents
         parent1, parent2 = select_parents(population, fitnesses, num_parents=2)
-        # Crossover
         offspring1, offspring2 = crossover(parent1, parent2)
-        # Mutate
         offspring1 = mutate(offspring1, mutation_rate, mutation_strength)
         offspring2 = mutate(offspring2, mutation_rate, mutation_strength)
-        # Add the new offspring to the new offspring list
         new_offspring.append(offspring1)
         if len(new_offspring) < len(worse_half):
             new_offspring.append(offspring2)
@@ -432,7 +435,7 @@ def genitor_replacement(select_parents, crossover, mutate, population, fitnesses
     # Replace the worse half with new offspring
     new_population = np.concatenate((better_half, new_offspring[:len(worse_half)]))
 
-    # Now we shuffle the new population to maintain genetic diversity
+    # Shuffle the new population to maintain genetic diversity
     np.random.shuffle(new_population)
 
     return new_population
@@ -493,38 +496,33 @@ def age_based_replacement_with_elitism(select_parents, crossover, mutate, popula
     elite_individual = population[elite_index]
     elite_fitness = fitnesses[elite_index]
 
-    new_population = []
+    new_population = []  # Start with a list to handle any type of offspring structure
     new_fitnesses = []
 
-    while len(new_population) < population_size:
-        # Select parents
+    idx = 0
+    while idx < population_size:
         parent1, parent2 = select_parents(population, fitnesses, num_parents=2)
-        # Crossover
         offspring1, offspring2 = crossover(parent1, parent2)
-        # Mutate
         offspring1 = mutate(offspring1, mutation_rate, mutation_strength)
         offspring2 = mutate(offspring2, mutation_rate, mutation_strength)
-        # Evaluate the fitness of the offspring
-        fitness1 = evaluate_population([offspring1], dimension)
-        fitness2 = evaluate_population([offspring2], dimension)
 
-        # Add offspring to the new population, ensuring we do not exceed the population size
-        if len(new_population) < population_size:
+        if idx + 2 <= population_size:  # Ensure we don't exceed population size
+            new_population.extend([offspring1, offspring2])
+            # Evaluate in pairs to reduce function calls, if population size permits
+            new_fitnesses.extend(evaluate_population([offspring1, offspring2], dimension))
+            idx += 2
+        else:
             new_population.append(offspring1)
-            new_fitnesses.append(fitness1)
-        if len(new_population) < population_size:
-            new_population.append(offspring2)
-            new_fitnesses.append(fitness2)
+            new_fitnesses.append(evaluate_population([offspring1], dimension)[0])
+            idx += 1
 
-    # Now we replace the worst individual with the elite if necessary
-    # First, find the worst individual's index in the new population
+    new_fitnesses = np.array(new_fitnesses)
     worst_index = np.argmax(new_fitnesses)
     if new_fitnesses[worst_index] > elite_fitness:
-        # Replace the worst individual with the elite individual
         new_population[worst_index] = elite_individual
         new_fitnesses[worst_index] = elite_fitness
 
-    return new_population
+    return np.array(new_population)
 
 def mu_plus_lambda_replacement(select_parents, crossover, mutate, population, fitnesses, population_size, mutation_rate, dimension, mutation_strength, evaluate_population, lambda_ratio=7):
     '''
@@ -538,21 +536,15 @@ def mu_plus_lambda_replacement(select_parents, crossover, mutate, population, fi
         offspring1 = mutate(offspring1, mutation_rate, mutation_strength)
         offspring2 = mutate(offspring2, mutation_rate, mutation_strength)
         lambda_offspring.extend([offspring1, offspring2])
-    
-    # Evaluate the fitness of new offspring if not already evaluated
+
     offspring_fitnesses = evaluate_population(lambda_offspring, dimension)
-    
-    # Merge offspring with the original population
+
     combined_population = np.concatenate((population, lambda_offspring))
     combined_fitnesses = np.concatenate((fitnesses, offspring_fitnesses))
-    
-    # Sort combined population by fitness
-    sorted_indices = np.argsort(combined_fitnesses)
-    sorted_combined_population = combined_population[sorted_indices]
-    
-    # Select the top mu individuals to form the next generation
-    new_population = sorted_combined_population[:population_size]
-    
+
+    top_indices = np.argpartition(combined_fitnesses, population_size)[:population_size]
+    new_population = combined_population[top_indices]
+
     return new_population
 
 # (μ, λ) Selection descartado porque es mas para multimodal

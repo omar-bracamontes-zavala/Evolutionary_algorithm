@@ -90,10 +90,10 @@ if __name__=='__main__':
     # Design
     initialize_population = ef.initialize_population
     evaluate_population = ef.evaluate_population
-    select_parents = ef.tournament_selection
+    select_parents = ef.fps_selection
     crossover = ef.simple_arithmetic_crossover
-    mutate = ef.non_uniform_mutation
-    replacement = ef.age_based_replacement_with_elitism
+    mutate = ef.uniform_mutation
+    replacement = ef.mu_plus_lambda_replacement
     
     # Parameters (example values)
     population_size = 100
