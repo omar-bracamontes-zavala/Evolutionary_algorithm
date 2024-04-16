@@ -54,7 +54,7 @@ def evolutionary_algorithm(
     
     for _ in range(max_generations):
         # Evaluate population
-        fitnesses = evaluate_population(population, dimension, fitness)
+        fitnesses = evaluate_population(population, dimension)#, fitness)
         
         # Log
         _register_best_individual_and_fitness(fitnesses, population, best_fitness_history, best_individuals_history)
@@ -69,13 +69,14 @@ def evolutionary_algorithm(
             population_size,
             mutation_rate,
             dimension,
-            mutation_strength
+            mutation_strength,
+            evaluate_population
         )
         
         # Optionally, here you can implement elitism to directly pass the best individual(s) to the next generation
         
     # Final evaluation to find the best solution
-    final_fitnesses = evaluate_population(population, dimension, fitness)
+    final_fitnesses = evaluate_population(population, dimension)#, fitness)
     
     # Log
     _register_best_individual_and_fitness(final_fitnesses, population, best_fitness_history, best_individuals_history)
@@ -91,8 +92,8 @@ if __name__=='__main__':
     evaluate_population = ef.evaluate_population
     select_parents = ef.tournament_selection
     crossover = ef.uniform_crossover
-    mutate = ef.non_uniform_mutation
-    replacement = ef.complete_replacement
+    mutate = ef.uniform_mutation
+    replacement = ef.age_based_replacement_with_elitism
     
     # Parameters (example values)
     population_size = 100

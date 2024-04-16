@@ -90,14 +90,14 @@ def initialize_population(population_size, number_of_particles, dimension, simul
     return population
 
 @jit(nopython=True, parallel=True)
-def evaluate_population(population, dimension, fitness_function_jitted):
+def evaluate_population(population, dimension):#, fitness_function_jitted):
     """
     Evaluate the fitness of each individual in the population using JIT compilation and parallel execution.
 
     Parameters:
         population (list of numpy.ndarray): The population to evaluate.
         dimension (int): The dimensionality of the space (e.g., 3 for three-dimensional space).
-        fitness_function_jitted (function): A JIT-compiled fitness function that calculates the fitness of an individual.
+        # fitness_function_jitted (function): A JIT-compiled fitness function that calculates the fitness of an individual.
 
     Returns:
         numpy.ndarray: An array containing the fitness of each individual in the population.
@@ -107,7 +107,7 @@ def evaluate_population(population, dimension, fitness_function_jitted):
 
     # Parallel loop through the population
     for i in prange(len(population)):
-        fitness_values[i] = fitness_function_jitted(population[i], dimension)
+        fitness_values[i] = fitness(population[i], dimension) # fitness se toma de aqui mismo dado que es estatico el objetivo de la optimizacion
 
     return fitness_values
 
@@ -356,7 +356,10 @@ def non_uniform_mutation(individual, mutation_rate, mu=0, sigma=1.):
 #
 # Replacement/Survivor Selection: Generate new population ( <replacement_strategy>_replacement )
 #
-def complete_replacement(select_parents, crossover, mutate, population, fitnesses, population_size, mutation_rate, dimension, mutation_strength):
+def aged_based_replacement(select_parents, crossover, mutate, population, fitnesses, population_size, mutation_rate, dimension, mutation_strength, evaluate_population):
+    '''
+    pag 88
+    '''
     new_population = []
     while len(new_population) < population_size:
         # Select parents
@@ -374,13 +377,161 @@ def complete_replacement(select_parents, crossover, mutate, population, fitnesse
             new_population.append(offspring2)
     return new_population
 
-# Age-Based Replacement
-# Fitness-Based Replacement
-# ??? Replace worst (GENITOR)
-# ??? Elitism
-# ??? Round-robin tournament
-# (μ + λ) Selection
-# (μ, λ) Selection
+def genitor_replacement(select_parents, crossover, mutate, population, fitnesses, population_size, mutation_rate, dimension, mutation_strength, evaluate_population, lambda_ratio=0.5):
+    '''
+    Replace worst  (tha half)
+    '''
+    # Sort the population by fitness in ascending order (for minimization)
+    sorted_indices = np.argsort(fitnesses)
+    sorted_population = np.array(population)[sorted_indices]
+
+    # Split the population into the better and worse parts
+    replacement_num = int(population_size*lambda_ratio)
+    better_half = sorted_population[:replacement_num]
+    worse_half = sorted_population[replacement_num:]
+    
+    # Generate new offspring to replace the worse half
+    new_offspring = []
+    while len(new_offspring) < len(worse_half):
+        # Select parents
+        parent1, parent2 = select_parents(population, fitnesses, num_parents=2)
+        # Crossover
+        offspring1, offspring2 = crossover(parent1, parent2)
+        # Mutate
+        offspring1 = mutate(offspring1, mutation_rate, mutation_strength)
+        offspring2 = mutate(offspring2, mutation_rate, mutation_strength)
+        # Add the new offspring to the new offspring list
+        new_offspring.append(offspring1)
+        if len(new_offspring) < len(worse_half):
+            new_offspring.append(offspring2)
+
+    # Replace the worse half with new offspring
+    new_population = np.concatenate((better_half, new_offspring[:len(worse_half)]))
+
+    # Now we shuffle the new population to maintain genetic diversity
+    np.random.shuffle(new_population)
+
+    return new_population
+
+# ??? Round-robin tournament descartadop orque es demasiado caro 32x
+# def _round_robin_tournament(population, fitnesses, q):
+#     # Calculate the number of individuals (μ)
+#     mu = len(population)
+
+#     # Initialize win counts
+#     win_counts = np.zeros(mu)
+
+#     # Perform round-robin tournament
+#     for i in range(mu):
+#         for _ in range(q):
+#             # Select a random opponent
+#             opponent_index = np.random.randint(mu)
+#             # Assign a win if the individual is better than the randomly selected opponent
+#             if fitnesses[i] < fitnesses[opponent_index]:
+#                 win_counts[i] += 1
+
+#     # Select the μ individuals with the greatest number of wins
+#     selected_indices = np.argsort(win_counts)[-mu:]
+#     return population[selected_indices], fitnesses[selected_indices]
+# def round_robin_replacement(select_parents, crossover, mutate, population, fitnesses, population_size, mutation_rate, dimension, mutation_strength, evaluate_population,q=10):
+    # Create a list to store offspring
+    offspring_list = []
+    while len(offspring_list) < population_size:
+        # Select parents and produce offspring
+        parent1, parent2 = select_parents(population, fitnesses)
+        offspring1, offspring2 = crossover(parent1, parent2)
+        offspring1 = mutate(offspring1, mutation_rate, mutation_strength)
+        offspring2 = mutate(offspring2, mutation_rate, mutation_strength)
+        offspring_list.extend([offspring1, offspring2])
+
+    # Truncate the list if we have too many offspring
+    offspring_list = offspring_list[:population_size]
+    
+    # Combine the offspring with the current population
+    combined_population = np.vstack((population, offspring_list))
+    combined_fitnesses = np.concatenate((fitnesses, [None] * population_size))  # Placeholder for offspring fitnesses
+
+    # Recalculate fitnesses for the combined population
+    # Assuming there is a function calculate_fitnesses that calculates the fitness for each individual
+    combined_fitnesses = evaluate_population(combined_population, dimension)
+
+    # Perform round-robin tournament to select the new population
+    new_population, new_fitnesses = _round_robin_tournament(combined_population, combined_fitnesses, q)
+
+    return new_population
+
+def age_based_replacement_with_elitism(select_parents, crossover, mutate, population, fitnesses, population_size, mutation_rate, dimension, mutation_strength, evaluate_population):
+    '''
+    Perform age-based replacement with elitism.
+    '''
+    # Identify the elite individual (the one with the best fitness)
+    elite_index = np.argmin(fitnesses)
+    elite_individual = population[elite_index]
+    elite_fitness = fitnesses[elite_index]
+
+    new_population = []
+    new_fitnesses = []
+
+    while len(new_population) < population_size:
+        # Select parents
+        parent1, parent2 = select_parents(population, fitnesses, num_parents=2)
+        # Crossover
+        offspring1, offspring2 = crossover(parent1, parent2)
+        # Mutate
+        offspring1 = mutate(offspring1, mutation_rate, mutation_strength)
+        offspring2 = mutate(offspring2, mutation_rate, mutation_strength)
+        # Evaluate the fitness of the offspring
+        fitness1 = evaluate_population([offspring1], dimension)
+        fitness2 = evaluate_population([offspring2], dimension)
+
+        # Add offspring to the new population, ensuring we do not exceed the population size
+        if len(new_population) < population_size:
+            new_population.append(offspring1)
+            new_fitnesses.append(fitness1)
+        if len(new_population) < population_size:
+            new_population.append(offspring2)
+            new_fitnesses.append(fitness2)
+
+    # Now we replace the worst individual with the elite if necessary
+    # First, find the worst individual's index in the new population
+    worst_index = np.argmax(new_fitnesses)
+    if new_fitnesses[worst_index] > elite_fitness:
+        # Replace the worst individual with the elite individual
+        new_population[worst_index] = elite_individual
+        new_fitnesses[worst_index] = elite_fitness
+
+    return new_population
+
+def mu_plus_lambda_replacement(select_parents, crossover, mutate, population, fitnesses, population_size, mutation_rate, dimension, mutation_strength, evaluate_population, lambda_ratio=7):
+    '''
+    Replace worst  (tha half)
+    '''
+    # Generate lambda offspring
+    lambda_offspring = []
+    for _ in range(int(population_size * lambda_ratio)):
+        parent1, parent2 = select_parents(population, fitnesses, num_parents=2)
+        offspring1, offspring2 = crossover(parent1, parent2)
+        offspring1 = mutate(offspring1, mutation_rate, mutation_strength)
+        offspring2 = mutate(offspring2, mutation_rate, mutation_strength)
+        lambda_offspring.extend([offspring1, offspring2])
+    
+    # Evaluate the fitness of new offspring if not already evaluated
+    offspring_fitnesses = evaluate_population(lambda_offspring, dimension)
+    
+    # Merge offspring with the original population
+    combined_population = np.concatenate((population, lambda_offspring))
+    combined_fitnesses = np.concatenate((fitnesses, offspring_fitnesses))
+    
+    # Sort combined population by fitness
+    sorted_indices = np.argsort(combined_fitnesses)
+    sorted_combined_population = combined_population[sorted_indices]
+    
+    # Select the top mu individuals to form the next generation
+    new_population = sorted_combined_population[:population_size]
+    
+    return new_population
+
+# (μ, λ) Selection descartado porque es mas para multimodal
 
 #
 # For an easier implementation on design
@@ -403,7 +554,10 @@ available_functions = {
         non_uniform_mutation,
     ],
     'replacement': [
-        complete_replacement,
+        aged_based_replacement,
+        genitor_replacement,
+        mu_plus_lambda_replacement,
+        age_based_replacement_with_elitism
     ],
 }
 
