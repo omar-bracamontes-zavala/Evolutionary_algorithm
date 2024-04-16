@@ -183,9 +183,9 @@ def add_perturbation_mutation(individual, mutation_rate, mutation_strength=0.1):
     return individual
 
 #
-# Generate new population ( <generate_new_population_strategy>_generate_new_population )
+# Replacement/Survivor Selection: Generate new population ( <replacement_strategy>_replacement )
 #
-def replace_all_generate_new_population(select_parents, crossover, mutate, population, fitnesses, population_size, mutation_rate, dimension, mutation_strength):
+def replace_all_replacement(select_parents, crossover, mutate, population, fitnesses, population_size, mutation_rate, dimension, mutation_strength):
     new_population = []
     while len(new_population) < population_size:
         # Select parents
@@ -221,8 +221,8 @@ available_functions = {
     'mutation': [
         add_perturbation_mutation,
     ],
-    'generate_new_population': [
-        replace_all_generate_new_population,
+    'replacement': [
+        replace_all_replacement,
     ],
 }
 

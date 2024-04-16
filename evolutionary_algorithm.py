@@ -60,7 +60,7 @@ def evolutionary_algorithm(
         select_parents,
         crossover,
         mutate,
-        generate_new_population,
+        replacement,
         # Algorithm Hyperparameters
         population_size,
         number_of_particles,
@@ -87,7 +87,7 @@ def evolutionary_algorithm(
         _register_best_individual_and_fitness(fitnesses, population, best_fitness_history, best_individuals_history)
         
         # Generate a new population
-        population = generate_new_population(
+        population = replacement(
             select_parents,
             crossover,
             mutate,
@@ -119,7 +119,7 @@ if __name__=='__main__':
     select_parents = ef.tournament_selection
     crossover = ef.uniform_crossover
     mutate = ef.add_perturbation_mutation
-    generate_new_population = ef.replace_all_generate_new_population#replace_all_generate_new_population
+    replacement = ef.complete_replacement
     
     # Parameters (example values)
     population_size = 100
@@ -138,7 +138,7 @@ if __name__=='__main__':
     #     select_parents,
     #     crossover,
     #     mutate,
-    #     generate_new_population,
+    #     replacement,
     #     population_size,
     #     number_of_particles,
     #     max_generations,
@@ -163,7 +163,7 @@ if __name__=='__main__':
         number_of_particles=number_of_particles,
         max_generations=max_generations,
         mutation_rate=mutation_rate,
-        generate_new_population=generate_new_population,
+        replacement=replacement,
         mutation_strength=mutation_strength,
         # Hyperparameters
     )
