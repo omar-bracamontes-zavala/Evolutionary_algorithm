@@ -210,12 +210,15 @@ def sus_selection(population, fitnesses, num_parents=2):
     '''
     population_size = len(population)
 
+    # Convert the population list to a NumPy array if it's not already
+    population_array = np.array(population)
+
     # Invert fitness values for minimization (assuming all fitnesses are positive)
     inverted_fitnesses = 1.0 / np.array(fitnesses)
 
     # Sort the population by these inverted fitnesses (higher is better now)
     sorted_indices = np.argsort(inverted_fitnesses)[::-1]
-    sorted_population = np.array(population)[sorted_indices]
+    sorted_population = population_array[sorted_indices]
     sorted_inverted_fitnesses = inverted_fitnesses[sorted_indices]
 
     # Calculate the cumulative sum of the inverted fitnesses
@@ -228,17 +231,14 @@ def sus_selection(population, fitnesses, num_parents=2):
     # Pick a random start for the pointer between 0 and pointer_distance
     start_point = np.random.uniform(0, pointer_distance)
 
-    # Select individuals
-    selected_parents = []
-    pointers = [start_point + i * pointer_distance for i in range(num_parents)]
-    pointer_idx = 0
-    current_member = 0
-    while current_member < population_size and pointer_idx < num_parents:
-        if cumulative_fitnesses[current_member] >= pointers[pointer_idx]:
-            selected_parents.append(sorted_population[current_member])
-            pointer_idx += 1
-        else:
-            current_member += 1
+    # Select individuals using vectorized operation
+    pointers = start_point + np.arange(num_parents) * pointer_distance
+    selected_indices = np.searchsorted(cumulative_fitnesses, pointers)
+    
+    # Ensure no index is out of bounds
+    selected_indices = np.minimum(selected_indices, population_size - 1)
+
+    selected_parents = sorted_population[selected_indices]
 
     return selected_parents
 
