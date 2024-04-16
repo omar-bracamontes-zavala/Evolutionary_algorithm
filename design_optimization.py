@@ -6,7 +6,12 @@ import evolutionary_functions as ef
 from evolutionary_functions import fitness
 
 
-def calculate_performance_metrics(evolutionary_algorithm, evolutionary_functions_set, sample_size = 20):
+def calculate_performance_metrics(
+                                evolutionary_algorithm, 
+                                evolutionary_functions_set, 
+                                sample_size = 30, 
+                                reference_global_optimum=-128.286,
+                                relative_success_threshold = 0.95):
     '''
     Calculates performance metrics over several runs.
     This function generates child processes.
@@ -14,6 +19,8 @@ def calculate_performance_metrics(evolutionary_algorithm, evolutionary_functions
         evolutionary_algorithm (func): Main function for the execution of the evolutive algorithm.
         evolutionary_functions_set (list): Ordered arguments for the evolutionary algorithm to be evaluated.
         sample_size (int): Number of samples to run.
+        reference_global_optimum (float): Fitness from the optimal best solution, for evaluating success.
+        relative_success_threshold (float): Proportion of the global optima reached to be considered as a successful run.
     returns
         Dictionary of metrics from the run.
     '''
@@ -24,13 +31,20 @@ def calculate_performance_metrics(evolutionary_algorithm, evolutionary_functions
 
     with Pool() as pool:
         best_fitnesses = pool.map(evolution_evaluation_wrapper , [None]*sample_size)
-    mean_best_fitness = np.mean([trial['best_fitness'] for trial in best_fitnesses])
-    return {'MBF': mean_best_fitness}
+    fitnesses_values_list = [trial['best_fitness'] for trial in best_fitnesses]
+    mean_best_fitness = np.mean(fitnesses_values_list)
+    successful_runs = [trial for trial in fitnesses_values_list if trial < reference_global_optimum*relative_success_threshold]
+    peak_performance = min(fitnesses_values_list)
+    success_rate = len(successful_runs) / sample_size
+
+    return {'MBF': mean_best_fitness, 'SR': success_rate, 'peak_performance': peak_performance}
 
 
 if __name__ == '__main__':
     initialize_population = ef.initialize_population
     evaluate_population = ef.evaluate_population
+
+
     select_parents = ef.tournament_selection
     crossover = ef.uniform_crossover
     mutate = ef.add_perturbation_mutation
@@ -38,14 +52,13 @@ if __name__ == '__main__':
     
     # Parameters (example values)
     population_size = 100
-    number_of_particles = 11
-    max_generations = 5000
+    number_of_particles = 8
+    max_generations = 1000
     mutation_rate = 0.01
     mutation_strength = 1. # this could has an adaptative control 
     
     ###########
     # For evaluation testing
-    # this fker has to have same order of args as in the definition for now
     evolutionary_args = [
         fitness,
         initialize_population,
@@ -61,4 +74,7 @@ if __name__ == '__main__':
         mutation_strength
         ]
     
-    print(calculate_performance_metrics(evolutionary_algorithm,evolutionary_args))
+    print(calculate_performance_metrics(evolutionary_algorithm,evolutionary_args,reference_global_optimum=-19.8))
+
+    # from evolutionary_functions import available_functions
+    # print(available_functions)
