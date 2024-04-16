@@ -5,6 +5,7 @@
 
 import numpy as np
 from numba import jit, njit, prange
+import heapq # para parent selection con probabulidades
 
 #
 # Fitness (Lennard-Jones potential)
@@ -131,7 +132,91 @@ def tournament_selection(population, fitnesses, tournament_size=3):
     participants_fitnesses = [fitnesses[idx] for idx in participants_idx]
     # Select the individual with the best fitness
     winner_idx = participants_idx[np.argmin(participants_fitnesses)]
-    return population[winner_idx]
+    return population[winner_idx], population, fitnesses # estos ultimos dos son para ajustar el output  de otras functiones
+
+# Fitness proportional selection pagina 80
+def fps_selection(population, fitnesses):
+    fitness_sum = sum(fitnesses)
+    probabilities = [f / fitness_sum for f in fitnesses]
+    # Get the index of the highest probability
+    max_prob_index = np.argmax(probabilities)
+    # Extract the parent using the index
+    selected_parent = population[max_prob_index]
+    # Remove selected parent and its fitness from the numpy array
+    population = np.delete(population, max_prob_index, axis=0)
+    fitnesses = np.delete(fitnesses, max_prob_index)
+    return selected_parent, population, fitnesses
+    
+# Ranking selection pagina 82
+def ranking_selection(population, fitnesses, num_parents=2, s=1.5):
+    '''
+    Parameters:
+        population (list of numpy.ndarray): The current population. Note: individuals are also np array
+        fitnesses (list of numpy.ndarray): The fitness of each individual in the population.
+    '''
+    population_size = len(population)
+        
+    # Sort the population and fitnesses by descending fitness
+    sorted_indices = np.argsort(fitnesses)[::-1]  # This gets indices to sort array in descending order
+    sorted_population = np.array(population)[sorted_indices]
+    print(sorted_indices)
+
+    # Calculate probabilities based on linear ranking
+    probabilities = np.array([(2-s)/population_size + 2*i*(s-1)/(population_size*(population_size-1)) for i in range(population_size)])
+
+    # Select the parents based on probabilities
+    selected_indices = np.random.choice(population_size, size=num_parents, replace=False, p=probabilities)
+    selected_parents = sorted_population[selected_indices]
+
+    return selected_parents
+    
+# Stochastic Universal Sampling (or roulette with chochos)
+def sus_selection(population, fitnesses, num_parents=2):
+    '''
+    Perform stochastic universal sampling selection on the given population.
+
+    Parameters:
+        population (list of numpy.ndarray): The current population, where individuals are also numpy arrays.
+        fitnesses (list): The fitness of each individual in the population.
+
+    Returns:
+        tuple: The selected parent, and the sorted population and fitness arrays.
+    '''
+    population_size = len(population)
+
+    # Sort the population and fitnesses by ascending fitness for minimization
+    sorted_indices = np.argsort(fitnesses)
+    sorted_population = np.array(population)[sorted_indices]
+    sorted_fitnesses = np.array(fitnesses)[sorted_indices]
+    print(sorted_indices)
+    print(sorted_fitnesses)
+
+    # Calculate the cumulative sum of the fitnesses
+    cumulative_fitnesses = np.cumsum(sorted_fitnesses)
+
+    # Calculate the total fitness and distance between pointers
+    total_fitness = cumulative_fitnesses[-1]
+    pointer_distance = total_fitness / num_parents
+
+    # Pick a random start for the pointer between 0 and pointer_distance
+    start_point = np.random.uniform(0, pointer_distance)
+
+    # Select individuals
+    selected_parents = []
+    pointers = [start_point + i * pointer_distance for i in range(num_parents)]
+    pointer_idx = 0
+    current_member = 0
+    while current_member < population_size and pointer_idx < num_parents:
+        if cumulative_fitnesses[current_member] >= pointers[pointer_idx]:
+            selected_parents.append(sorted_population[current_member])
+            pointer_idx += 1
+        else:
+            current_member += 1
+
+    return selected_parents
+
+
+# Uniform Parent Selection
 
 #
 # Crossover ( <crossover_strategy>_crossover )
@@ -189,11 +274,11 @@ def complete_replacement(select_parents, crossover, mutate, population, fitnesse
     new_population = []
     while len(new_population) < population_size:
         # Select parents
-        parent1 = select_parents(population, fitnesses)
-        parent2 = select_parents(population, fitnesses)
+        parent1, parent2 = select_parents(population, fitnesses, num_parents=2)
+        # parent2, population, fitnesses = select_parents(population, fitnesses)
         # Ensure parent2 is different from parent1
         while np.array_equal(parent1, parent2):
-            parent2 = select_parents(population, fitnesses)
+            parent2, population, fitnesses = select_parents(population, fitnesses)
         # Crossover
         offspring1, offspring2 = crossover(parent1, parent2)
         # Mutate
@@ -207,6 +292,13 @@ def complete_replacement(select_parents, crossover, mutate, population, fitnesse
             new_population.append(offspring2)
     return new_population
 
+# Age-Based Replacement
+# Fitness-Based Replacement
+# ??? Replace worst (GENITOR)
+# ??? Elitism
+# ??? Round-robin tournament
+# (μ + λ) Selection
+# (μ, λ) Selection
 
 #
 # For an easier implementation on design
@@ -214,6 +306,7 @@ def complete_replacement(select_parents, crossover, mutate, population, fitnesse
 available_functions = {
     'selection': [
         tournament_selection,
+        fps_selection,
     ],
     'crossover': [
         uniform_crossover,
@@ -227,10 +320,17 @@ available_functions = {
 }
 
 if __name__=='__main__':
-    from time import time
-    a = _generate_individual(100, 3, [-10,10])
+    # from time import time
+    # a = _generate_individual(100, 3, [-10,10])
     
-    start = time()
-    b = fitness(a, 3)
-    print( time()-start )
-    print(b)
+    # start = time()
+    # b = fitness(a, 3)
+    # print( time()-start )
+    # print(b)
+    p = [ [1,1], [2,2], [3,3], [4,4], [5,5]] # ideal es 3, 5, 1, 2, 4
+    f = [  0.01,   0.02,  0.03,  0.4,   0.5] 
+    # Select parents
+    parent1, parent2 = sus_selection(p, f)
+    
+    print('parent1',parent1)
+    print('parent2',parent2)
