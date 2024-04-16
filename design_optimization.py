@@ -1,9 +1,10 @@
-import numpy as np
-from multiprocess import Pool
-from time import time
+from evolutionary_functions import fitness, available_functions
 from evolutionary_algorithm import evolutionary_algorithm
 import evolutionary_functions as ef
-from evolutionary_functions import fitness
+from multiprocess import Pool
+from itertools import product
+from time import time
+import numpy as np
 
 
 def calculate_performance_metrics(
@@ -40,41 +41,66 @@ def calculate_performance_metrics(
     return {'MBF': mean_best_fitness, 'SR': success_rate, 'peak_performance': peak_performance}
 
 
+def get_design_functions_combinations(available_functions):
+    '''
+    Obtains the combination of functions to evaluate.
+    The enumerate is for later retrieving the resulting optimal combination of functions.
+    Returns combinations as lists of tuples [ (index_of_function,function), ...]
+    '''
+    indexed_selections = list(enumerate(available_functions['selection']))
+    indexed_crossovers = list(enumerate(available_functions['crossover']))
+    indexed_mutations = list(enumerate(available_functions['mutation']))
+    indexed_replacement = list(enumerate(available_functions['replacement']))
+    
+    return product(indexed_selections, indexed_crossovers, indexed_mutations, indexed_replacement)
+    
+
+
 if __name__ == '__main__':
+    ## General functions
     initialize_population = ef.initialize_population
     evaluate_population = ef.evaluate_population
-
+    
+    # Parameters (example values)
+    population_size = 100
+    number_of_particles = 30
+    max_generations = 500
+    mutation_rate = 0.01
+    mutation_strength = 1. # this could has an adaptative control 
 
     select_parents = ef.tournament_selection
     crossover = ef.uniform_crossover
     mutate = ef.add_perturbation_mutation
     replacement = ef.complete_replacement
-    
-    # Parameters (example values)
-    population_size = 100
-    number_of_particles = 8
-    max_generations = 1000
-    mutation_rate = 0.01
-    mutation_strength = 1. # this could has an adaptative control 
-    
-    ###########
-    # For evaluation testing
-    evolutionary_args = [
+
+
+    general_evolutionary_functions = [
         fitness,
         initialize_population,
-        evaluate_population,
-        select_parents,
-        crossover,
-        mutate,
-        replacement,
+        evaluate_population
+        ]
+
+    parameters = [
         population_size,
         number_of_particles,
         max_generations,
         mutation_rate,
         mutation_strength
         ]
-    
-    print(calculate_performance_metrics(evolutionary_algorithm,evolutionary_args,reference_global_optimum=-19.8))
 
-    # from evolutionary_functions import available_functions
-    # print(available_functions)
+    combination_performances = []
+
+    design_function_option_combinations = get_design_functions_combinations(available_functions)
+    for function_combination in design_function_option_combinations:
+        ## Functions and indexes have to be unpacked
+        design_functions = [element[1] for element in function_combination]
+        design_functions_indexes = [element[0] for element in function_combination]
+
+        evolutionary_algorithm_args = general_evolutionary_functions + design_functions + parameters
+        performnances = calculate_performance_metrics(evolutionary_algorithm,evolutionary_algorithm_args)
+        combination_performances.append({
+            'combination_indexes':design_functions_indexes,
+            'performance_metrics': performnances,
+            })
+
+    print(combination_performances)
