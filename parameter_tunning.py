@@ -1,9 +1,17 @@
 import numpy as np
+from helpers.get_top_designs import get_merged_tops
 
-number_of_particles = 11
-# Parameters (example values)
+#
+# Designs
+#
+top_designs = get_merged_tops('results/cleaned_results.json', 3)
+
+#
+# Hyper-parameters
 def generate_parameters_set(default, start_rate=0.5, end_rate=5, step_rate=0.5):
     return np.arange( int(default*start_rate), int(default*end_rate), int(default*step_rate)) 
+
+number_of_particles = 11 # este se barrera despues de tunnear
 
 population_size_default = 100
 population_size_set = generate_parameters_set(100)
