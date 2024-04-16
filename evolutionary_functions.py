@@ -551,10 +551,10 @@ def mu_plus_lambda_replacement(select_parents, crossover, mutate, population, fi
 
 #
 # For an easier implementation on design
-#
+# Note: tournanment selection + mu_plus_lambda_replacement crashes. Note: Blx dont work with numba
 available_functions = {
     'selection': [
-        # tournament_selection,
+        tournament_selection,
         fps_selection,
         ranking_selection,
         sus_selection,
@@ -562,7 +562,7 @@ available_functions = {
     'crossover': [
         uniform_crossover,
         simple_arithmetic_crossover,
-        # blx_alpha_crossover,
+        blx_alpha_crossover,
     ],
     'mutation': [
         add_perturbation_mutation,
@@ -570,10 +570,10 @@ available_functions = {
         non_uniform_mutation,
     ],
     'replacement': [
-        # aged_based_replacement,
-        # genitor_replacement,
+        aged_based_replacement,
+        genitor_replacement,
         mu_plus_lambda_replacement,
-        # age_based_replacement_with_elitism
+        age_based_replacement_with_elitism
     ],
 }
 

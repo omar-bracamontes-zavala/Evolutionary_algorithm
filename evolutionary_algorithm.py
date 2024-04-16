@@ -132,6 +132,6 @@ if __name__=='__main__':
     plt.ylabel('Best Fitness Score')
     plt.show()
 
-    # from particles_animation import visualize_particle_system
+    # from helpers.particles_animation import visualize_particle_system
     # print('Finished')
     # visualize_particle_system(best_individuals_history,best_fitness_history,number_of_particles)
