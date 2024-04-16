@@ -91,8 +91,8 @@ if __name__=='__main__':
     initialize_population = ef.initialize_population
     evaluate_population = ef.evaluate_population
     select_parents = ef.tournament_selection
-    crossover = ef.uniform_crossover
-    mutate = ef.uniform_mutation
+    crossover = ef.simple_arithmetic_crossover
+    mutate = ef.non_uniform_mutation
     replacement = ef.age_based_replacement_with_elitism
     
     # Parameters (example values)

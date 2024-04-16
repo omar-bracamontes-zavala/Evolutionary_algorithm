@@ -9,7 +9,7 @@ from numba import jit, njit, prange
 #
 # Fitness (Lennard-Jones potential)
 #
-@jit(nopython=True)
+@njit
 def _particle_lennard_jones_optimized(distances, sigma=1.0, epsilon=1.0, penalization_strength=1e10):
     '''
     Calculate the Lennard-Jones potential for a matrix of distances.
@@ -35,7 +35,7 @@ def _particle_lennard_jones_optimized(distances, sigma=1.0, epsilon=1.0, penaliz
 
     return potentials
 
-@jit(nopython=True)
+@njit
 def fitness(molecule, dimension, sigma=1.0, epsilon=1.0):
     """
     Calculate the total Lennard-Jones potential energy of a molecule using optimized operations and JIT compilation with Numba.
@@ -130,22 +130,22 @@ def tournament_selection(population, fitnesses, tournament_size=3, num_parents=2
     selected_parents = []
     population_size = len(population)
 
-    def is_unique(parent, parent_list):
-        """ Check if parent is unique in parent_list considering numpy array equivalence """
-        return all(not np.array_equal(parent, existing_parent) for existing_parent in parent_list)
-
     while len(selected_parents) < num_parents:
         # Randomly select tournament_size individuals from the population
         participants_idx = np.random.choice(population_size, tournament_size, replace=False)
-        participants_fitnesses = [fitnesses[idx] for idx in participants_idx]
+        participants_fitnesses = np.array([fitnesses[idx] for idx in participants_idx])
 
         # Select the individual with the best (minimum) fitness
         winner_idx = participants_idx[np.argmin(participants_fitnesses)]
 
-        # Ensure unique parents are selected if the population size allows it
-        if is_unique(population[winner_idx], selected_parents) or len(set(fitnesses)) < num_parents:
+        # Check for unique selection
+        if all(not np.array_equal(population[winner_idx], parent) for parent in selected_parents):
             selected_parents.append(population[winner_idx])
-    
+
+        # Handling non-unique cases might require a different approach or relax the constraint in Numba
+        if len(selected_parents) == num_parents:
+            break
+
     return selected_parents
 
 # Fitness proportional selection pagina 80
@@ -263,6 +263,7 @@ def uniform_crossover(parent1, parent2):
     
     return offspring1, offspring2
 
+@njit  # Use nopython mode for better performance
 def simple_arithmetic_crossover(parent1, parent2, k=3):
     '''
     Se deja fijo en k=3 porque es fijar la primera particula.
@@ -270,18 +271,19 @@ def simple_arithmetic_crossover(parent1, parent2, k=3):
     # Initialize offspring as copies of the parents
     offspring1, offspring2 = np.copy(parent1), np.copy(parent2)
     # Perform the simple arithmetic crossover
-    alpha = np.random.rand() # Randomly choose a mixing ratio pag. 65
+    alpha = np.random.rand()  # Randomly choose a mixing ratio
     offspring1[k:] = alpha * parent1[k:] + (1 - alpha) * parent2[k:]
     offspring2[k:] = alpha * parent2[k:] + (1 - alpha) * parent1[k:]
     
     return offspring1, offspring2
 
+@njit
 def blx_alpha_crossover(parent1, parent2, alpha=0.5):
     """
     Perform Blend Crossover (BLX-α) on two parents to produce a single offspring.
 
-    :param alpha: The alpha parameter controls the range of the blend. # libro pag 67
-    :return: An array representing the offspring.
+    alpha: The alpha parameter controls the range of the blend.
+    return: An array representing the offspring.
     """
     # Ensure the parents are numpy arrays
     parent1 = np.array(parent1)
@@ -325,7 +327,18 @@ def add_perturbation_mutation(individual, mutation_rate, mutation_strength=0.1):
             individual[i] +=  np.random.uniform(-mutation_strength, mutation_strength)
     return individual
 
+@njit
 def uniform_mutation(individual, mutation_rate, simulation_box_length=1.):
+    """
+    Apply uniform mutation to an individual based on a given mutation rate.
+    Each gene has a chance to mutate based on the mutation rate, with the new value
+    randomly chosen uniformly within a range defined by the simulation box length.
+
+    individual: NumPy array representing the individual's genes.
+    mutation_rate: Probability of each gene undergoing mutation.
+    simulation_box_length: Defines the range for the mutation.
+    return: The mutated individual.
+    """
     # Generate mutation probabilities for each gene
     mutation_probabilities = np.random.rand(len(individual))
     
@@ -333,14 +346,24 @@ def uniform_mutation(individual, mutation_rate, simulation_box_length=1.):
     mutations = mutation_probabilities < mutation_rate
     
     # Apply mutations
-    individual[mutations] = np.random.uniform(-simulation_box_length, simulation_box_length, size=np.sum(mutations))
+    if np.any(mutations):
+        individual[mutations] = np.random.uniform(-simulation_box_length, simulation_box_length, size=np.sum(mutations))
     
     return individual
 
+@njit
 def non_uniform_mutation(individual, mutation_rate, mu=0, sigma=1.):
-    '''
-    sigma es la desviacion estandar y es el tamaño de paso de la mutacion
-    '''
+    """
+    Apply non-uniform mutation to an individual based on a given mutation rate.
+    Each gene that mutates is assigned a new value generated from a normal distribution
+    centered at 'mu' with standard deviation 'sigma'.
+
+    individual: NumPy array representing the individual's genes.
+    mutation_rate: Probability of each gene undergoing mutation.
+    mu: Mean of the normal distribution used for mutation.
+    sigma: Standard deviation of the normal distribution, represents mutation step size.
+    return: The mutated individual.
+    """
     # Generate mutation probabilities for each gene
     mutation_probabilities = np.random.rand(len(individual))
     
@@ -348,7 +371,8 @@ def non_uniform_mutation(individual, mutation_rate, mu=0, sigma=1.):
     mutations = mutation_probabilities < mutation_rate
     
     # Apply mutations
-    individual[mutations] = np.random.normal(mu, sigma, size=np.sum(mutations))
+    if np.any(mutations):
+        individual[mutations] = np.random.normal(mu, sigma, size=np.sum(mutations))
     
     return individual
 
