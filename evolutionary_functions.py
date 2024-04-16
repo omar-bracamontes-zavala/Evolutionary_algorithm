@@ -5,7 +5,6 @@
 
 import numpy as np
 from numba import jit, njit, prange
-import heapq # para parent selection con probabulidades
 
 #
 # Fitness (Lennard-Jones potential)
@@ -264,6 +263,44 @@ def uniform_crossover(parent1, parent2):
     
     return offspring1, offspring2
 
+def simple_arithmetic_crossover(parent1, parent2, k=3):
+    '''
+    Se deja fijo en k=3 porque es fijar la primera particula.
+    '''
+    # Initialize offspring as copies of the parents
+    offspring1, offspring2 = np.copy(parent1), np.copy(parent2)
+    # Perform the simple arithmetic crossover
+    alpha = np.random.rand() # Randomly choose a mixing ratio pag. 65
+    offspring1[k:] = alpha * parent1[k:] + (1 - alpha) * parent2[k:]
+    offspring2[k:] = alpha * parent2[k:] + (1 - alpha) * parent1[k:]
+    
+    return offspring1, offspring2
+
+def blx_alpha_crossover(parent1, parent2, alpha=0.5):
+    """
+    Perform Blend Crossover (BLX-α) on two parents to produce a single offspring.
+
+    :param alpha: The alpha parameter controls the range of the blend. # libro pag 67
+    :return: An array representing the offspring.
+    """
+    # Ensure the parents are numpy arrays
+    parent1 = np.array(parent1)
+    parent2 = np.array(parent2)
+
+    # Calculate the range between the parents
+    I = np.abs(parent2 - parent1)
+
+    # Generate offspring with genes within the range extended by alpha
+    min_genes = np.minimum(parent1, parent2) - I * alpha
+    max_genes = np.maximum(parent1, parent2) + I * alpha
+
+    # Generate two offspring within the range
+    offspring1 = min_genes + np.random.rand(*parent1.shape) * (max_genes - min_genes)
+    offspring2 = min_genes + np.random.rand(*parent2.shape) * (max_genes - min_genes)
+
+    return offspring1, offspring2
+        
+    
 #
 # Mutation ( <mutation_strategy>_mutation )
 #
@@ -287,6 +324,34 @@ def add_perturbation_mutation(individual, mutation_rate, mutation_strength=0.1):
             # Apply a small, random change
             individual[i] +=  np.random.uniform(-mutation_strength, mutation_strength)
     return individual
+
+def uniform_mutation(individual, mutation_rate, simulation_box_length=1.):
+    # Generate mutation probabilities for each gene
+    mutation_probabilities = np.random.rand(len(individual))
+    
+    # Determine which genes will mutate
+    mutations = mutation_probabilities < mutation_rate
+    
+    # Apply mutations
+    individual[mutations] = np.random.uniform(-simulation_box_length, simulation_box_length, size=np.sum(mutations))
+    
+    return individual
+
+def non_uniform_mutation(individual, mutation_rate, mu=0, sigma=1.):
+    '''
+    sigma es la desviacion estandar y es el tamaño de paso de la mutacion
+    '''
+    # Generate mutation probabilities for each gene
+    mutation_probabilities = np.random.rand(len(individual))
+    
+    # Determine which genes will mutate
+    mutations = mutation_probabilities < mutation_rate
+    
+    # Apply mutations
+    individual[mutations] = np.random.normal(mu, sigma, size=np.sum(mutations))
+    
+    return individual
+
 
 #
 # Replacement/Survivor Selection: Generate new population ( <replacement_strategy>_replacement )
@@ -329,9 +394,13 @@ available_functions = {
     ],
     'crossover': [
         uniform_crossover,
+        simple_arithmetic_crossover,
+        blx_alpha_crossover,
     ],
     'mutation': [
         add_perturbation_mutation,
+        uniform_mutation,
+        non_uniform_mutation,
     ],
     'replacement': [
         complete_replacement,

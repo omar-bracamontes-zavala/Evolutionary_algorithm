@@ -91,13 +91,13 @@ if __name__=='__main__':
     evaluate_population = ef.evaluate_population
     select_parents = ef.tournament_selection
     crossover = ef.uniform_crossover
-    mutate = ef.add_perturbation_mutation
+    mutate = ef.non_uniform_mutation
     replacement = ef.complete_replacement
     
     # Parameters (example values)
     population_size = 100
     number_of_particles = 11
-    max_generations = 5000
+    max_generations = 500
     mutation_rate = 0.01
     mutation_strength = 1. # this could has an adaptative control   
 
@@ -131,6 +131,6 @@ if __name__=='__main__':
     plt.ylabel('Best Fitness Score')
     plt.show()
 
-    from particles_animation import visualize_particle_system
-    print('Finished')
-    visualize_particle_system(best_individuals_history,best_fitness_history,number_of_particles)
+    # from particles_animation import visualize_particle_system
+    # print('Finished')
+    # visualize_particle_system(best_individuals_history,best_fitness_history,number_of_particles)
