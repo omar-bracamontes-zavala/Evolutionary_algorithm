@@ -130,6 +130,11 @@ def tournament_selection(population, fitnesses, tournament_size=3, num_parents=2
     """
     selected_parents = []
     population_size = len(population)
+
+    def is_unique(parent, parent_list):
+        """ Check if parent is unique in parent_list considering numpy array equivalence """
+        return all(not np.array_equal(parent, existing_parent) for existing_parent in parent_list)
+
     while len(selected_parents) < num_parents:
         # Randomly select tournament_size individuals from the population
         participants_idx = np.random.choice(population_size, tournament_size, replace=False)
@@ -139,7 +144,7 @@ def tournament_selection(population, fitnesses, tournament_size=3, num_parents=2
         winner_idx = participants_idx[np.argmin(participants_fitnesses)]
 
         # Ensure unique parents are selected if the population size allows it
-        if population[winner_idx] not in selected_parents or len(set(fitnesses)) < num_parents:
+        if is_unique(population[winner_idx], selected_parents) or len(set(fitnesses)) < num_parents:
             selected_parents.append(population[winner_idx])
     
     return selected_parents
@@ -290,10 +295,6 @@ def complete_replacement(select_parents, crossover, mutate, population, fitnesse
     while len(new_population) < population_size:
         # Select parents
         parent1, parent2 = select_parents(population, fitnesses, num_parents=2)
-        # parent2, population, fitnesses = select_parents(population, fitnesses)
-        # Ensure parent2 is different from parent1
-        # while np.array_equal(parent1, parent2):
-        #     parent2, population, fitnesses = select_parents(population, fitnesses)
         # Crossover
         offspring1, offspring2 = crossover(parent1, parent2)
         # Mutate
@@ -322,6 +323,8 @@ available_functions = {
     'selection': [
         tournament_selection,
         fps_selection,
+        ranking_selection,
+        sus_selection,
     ],
     'crossover': [
         uniform_crossover,
