@@ -1,30 +1,44 @@
 import json
 
-# Opening JSON file
-mu_f = open('results_mu.json')
-mu_data = json.load(mu_f)
+def load_json_data(filepath):
+    """Load JSON data from a specified filepath."""
+    with open(filepath, 'r') as file:
+        return json.load(file)
 
-results_f = open('results.json')
-data = json.load(results_f)
+def increment_index(data, index, shift):
+    """Increment the specified index for each design in data by a shift."""
+    for design in data:
+        design['combination_indexes'][index] += shift
 
+def remove_unwanted_data(data):
+    """Remove data entries where 'performance_metrics' is a string."""
+    indices_to_delete = [i for i, design in enumerate(data) if isinstance(design['performance_metrics'], str)]
+    # Sort indices in descending order to avoid shifting issues
+    indices_to_delete.sort(reverse=True)
+    for index in indices_to_delete:
+        del data[index]
 
-selection_shift = 1
-replacement_shift = 2
+def save_data(data, filepath):
+    """Save data to a JSON file."""
+    with open(filepath, 'w') as file:
+        json.dump(data, file)
 
-for design in mu_data:
-    # Selection functions are in col 0
-    design['combination_indexes'][0] += selection_shift
-    # Replacement functions are in col -1
-    design['combination_indexes'][-1] += replacement_shift
-    
-print(json.dumps(mu_data,indent=4))
+# Load mu data and increment indexes
+mu_data = load_json_data('results/results_mu.json')
+increment_index(mu_data, 0, 1)  # selection functions are in column 0 and shifted 1 place
+increment_index(mu_data, -1, 2)  # replacement functions are in column -1 and shifted 2 places
 
-print(len(data), len(mu_data))
+# Load results data and clean it
+data = load_json_data('results/results.json')
+remove_unwanted_data(data)
 
+# Join mu_data with cleaned data
+combined_data = data + mu_data
 
-new_data = data+mu_data
+# Save the combined data
+save_data(combined_data, 'results/cleaned_results.json')
 
-print(len(new_data))
-
-with open('updated_results.json','w') as json_file:
-    json.dump(new_data,json_file)
+# Print lengths of data for verification
+print(f"Length of mu_data: {len(mu_data)}")
+print(f"Length of cleaned data: {len(data)}")
+print(f"Total length of combined data: {len(combined_data)}")
