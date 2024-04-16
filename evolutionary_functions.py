@@ -165,7 +165,7 @@ def fps_selection(population, fitnesses, num_parents=2):
     return selected_parents
     
 # Ranking selection pagina 82
-def ranking_selection(population, fitnesses, num_parents=2, s=1.5):
+def ranking_selection(population, fitnesses, s=1.5,  num_parents=2):
     '''
     Parameters:
         population (list of numpy.ndarray): The current population. Note: individuals are also np array
@@ -233,9 +233,6 @@ def sus_selection(population, fitnesses, num_parents=2):
 
     return selected_parents
 
-
-# Uniform Parent Selection
-
 #
 # Crossover ( <crossover_strategy>_crossover )
 #
@@ -295,8 +292,8 @@ def complete_replacement(select_parents, crossover, mutate, population, fitnesse
         parent1, parent2 = select_parents(population, fitnesses, num_parents=2)
         # parent2, population, fitnesses = select_parents(population, fitnesses)
         # Ensure parent2 is different from parent1
-        while np.array_equal(parent1, parent2):
-            parent2, population, fitnesses = select_parents(population, fitnesses)
+        # while np.array_equal(parent1, parent2):
+        #     parent2, population, fitnesses = select_parents(population, fitnesses)
         # Crossover
         offspring1, offspring2 = crossover(parent1, parent2)
         # Mutate
