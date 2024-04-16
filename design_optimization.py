@@ -68,12 +68,6 @@ if __name__ == '__main__':
     mutation_rate = 0.01
     mutation_strength = 1. # this could has an adaptative control 
 
-    select_parents = ef.tournament_selection
-    crossover = ef.uniform_crossover
-    mutate = ef.add_perturbation_mutation
-    replacement = ef.complete_replacement
-
-
     general_evolutionary_functions = [
         fitness,
         initialize_population,
