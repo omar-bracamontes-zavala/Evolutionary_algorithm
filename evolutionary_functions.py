@@ -151,17 +151,17 @@ def tournament_selection(population, fitnesses, tournament_size=3, num_parents=2
 # Fitness proportional selection pagina 80
 def fps_selection(population, fitnesses, num_parents=2):
     population_size = len(population)
+    fitnesses = np.array(fitnesses)
 
     # Transform fitness values for minimization (handle negatives and zero)
-    # Shift fitness values so that the lowest fitness has the highest selection probability
-    max_fitness = max(fitnesses)
-    shifted_fitnesses = [max_fitness - f + 1 for f in fitnesses]
+    max_fitness = np.max(fitnesses)
+    shifted_fitnesses = max_fitness - fitnesses + 1
 
     # Calculate the sum of the shifted fitnesses
-    total_shifted_fitness = sum(shifted_fitnesses)
+    total_shifted_fitness = np.sum(shifted_fitnesses)
 
     # Calculate selection probabilities based on shifted fitnesses
-    probabilities = [f / total_shifted_fitness for f in shifted_fitnesses]
+    probabilities = shifted_fitnesses / total_shifted_fitness
 
     # Select the parents based on these probabilities
     selected_indices = np.random.choice(population_size, size=num_parents, replace=False, p=probabilities)
