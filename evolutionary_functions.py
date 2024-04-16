@@ -115,37 +115,54 @@ def evaluate_population(population, dimension, fitness_function_jitted):
 #
 # Parent Selection (<selection_strategy>_selection)
 #
-def tournament_selection(population, fitnesses, tournament_size=3):
+def tournament_selection(population, fitnesses, tournament_size=3, num_parents=2):
     """
-    Select an individual from the population using tournament selection.
+    Perform tournament selection to choose multiple parents from the population for a minimization problem.
 
     Parameters:
         population (list of numpy.ndarray): The current population.
         fitnesses (list of float): The fitness of each individual in the population.
         tournament_size (int): The number of individuals competing in each tournament.
+        num_parents (int): The number of parents to select.
 
     Returns:
-        numpy.ndarray: The selected individual.
+        list of numpy.ndarray: The selected parents.
     """
-    # Randomly select tournament_size individuals from the population
-    participants_idx = np.random.choice(len(population), tournament_size, replace=False)
-    participants_fitnesses = [fitnesses[idx] for idx in participants_idx]
-    # Select the individual with the best fitness
-    winner_idx = participants_idx[np.argmin(participants_fitnesses)]
-    return population[winner_idx], population, fitnesses # estos ultimos dos son para ajustar el output  de otras functiones
+    selected_parents = []
+    population_size = len(population)
+    while len(selected_parents) < num_parents:
+        # Randomly select tournament_size individuals from the population
+        participants_idx = np.random.choice(population_size, tournament_size, replace=False)
+        participants_fitnesses = [fitnesses[idx] for idx in participants_idx]
+
+        # Select the individual with the best (minimum) fitness
+        winner_idx = participants_idx[np.argmin(participants_fitnesses)]
+
+        # Ensure unique parents are selected if the population size allows it
+        if population[winner_idx] not in selected_parents or len(set(fitnesses)) < num_parents:
+            selected_parents.append(population[winner_idx])
+    
+    return selected_parents
 
 # Fitness proportional selection pagina 80
-def fps_selection(population, fitnesses):
-    fitness_sum = sum(fitnesses)
-    probabilities = [f / fitness_sum for f in fitnesses]
-    # Get the index of the highest probability
-    max_prob_index = np.argmax(probabilities)
-    # Extract the parent using the index
-    selected_parent = population[max_prob_index]
-    # Remove selected parent and its fitness from the numpy array
-    population = np.delete(population, max_prob_index, axis=0)
-    fitnesses = np.delete(fitnesses, max_prob_index)
-    return selected_parent, population, fitnesses
+def fps_selection(population, fitnesses, num_parents=2):
+    population_size = len(population)
+    
+    # Invert fitness values to prioritize lower fitnesses
+    # Ensure all fitness values are positive and non-zero to avoid division by zero
+    inverted_fitnesses = [1.0 / f for f in fitnesses]
+
+    # Calculate the sum of inverted fitnesses
+    inverted_fitness_sum = sum(inverted_fitnesses)
+
+    # Calculate selection probabilities based on inverted fitnesses
+    probabilities = [f / inverted_fitness_sum for f in inverted_fitnesses]
+
+    # Select the parents based on these probabilities
+    selected_indices = np.random.choice(population_size, size=num_parents, replace=False, p=probabilities)
+    selected_parents = [population[i] for i in selected_indices]
+
+    return selected_parents
     
 # Ranking selection pagina 82
 def ranking_selection(population, fitnesses, num_parents=2, s=1.5):
@@ -184,15 +201,16 @@ def sus_selection(population, fitnesses, num_parents=2):
     '''
     population_size = len(population)
 
-    # Sort the population and fitnesses by ascending fitness for minimization
-    sorted_indices = np.argsort(fitnesses)
-    sorted_population = np.array(population)[sorted_indices]
-    sorted_fitnesses = np.array(fitnesses)[sorted_indices]
-    print(sorted_indices)
-    print(sorted_fitnesses)
+    # Invert fitness values for minimization (assuming all fitnesses are positive)
+    inverted_fitnesses = 1.0 / np.array(fitnesses)
 
-    # Calculate the cumulative sum of the fitnesses
-    cumulative_fitnesses = np.cumsum(sorted_fitnesses)
+    # Sort the population by these inverted fitnesses (higher is better now)
+    sorted_indices = np.argsort(inverted_fitnesses)[::-1]
+    sorted_population = np.array(population)[sorted_indices]
+    sorted_inverted_fitnesses = inverted_fitnesses[sorted_indices]
+
+    # Calculate the cumulative sum of the inverted fitnesses
+    cumulative_fitnesses = np.cumsum(sorted_inverted_fitnesses)
 
     # Calculate the total fitness and distance between pointers
     total_fitness = cumulative_fitnesses[-1]
@@ -330,7 +348,7 @@ if __name__=='__main__':
     p = [ [1,1], [2,2], [3,3], [4,4], [5,5]] # ideal es 3, 5, 1, 2, 4
     f = [  0.01,   0.02,  0.03,  0.4,   0.5] 
     # Select parents
-    parent1, parent2 = sus_selection(p, f)
+    parent1, parent2 = tournament_selection(p, f)
     
     print('parent1',parent1)
     print('parent2',parent2)
