@@ -461,31 +461,31 @@ def genitor_replacement(select_parents, crossover, mutate, population, fitnesses
 #     selected_indices = np.argsort(win_counts)[-mu:]
 #     return population[selected_indices], fitnesses[selected_indices]
 # def round_robin_replacement(select_parents, crossover, mutate, population, fitnesses, population_size, mutation_rate, dimension, mutation_strength, evaluate_population,q=10):
-    # Create a list to store offspring
-    offspring_list = []
-    while len(offspring_list) < population_size:
-        # Select parents and produce offspring
-        parent1, parent2 = select_parents(population, fitnesses)
-        offspring1, offspring2 = crossover(parent1, parent2)
-        offspring1 = mutate(offspring1, mutation_rate, mutation_strength)
-        offspring2 = mutate(offspring2, mutation_rate, mutation_strength)
-        offspring_list.extend([offspring1, offspring2])
+# # Create a list to store offspring
+# offspring_list = []
+# while len(offspring_list) < population_size:
+#     # Select parents and produce offspring
+#     parent1, parent2 = select_parents(population, fitnesses)
+#     offspring1, offspring2 = crossover(parent1, parent2)
+#     offspring1 = mutate(offspring1, mutation_rate, mutation_strength)
+#     offspring2 = mutate(offspring2, mutation_rate, mutation_strength)
+#     offspring_list.extend([offspring1, offspring2])
 
-    # Truncate the list if we have too many offspring
-    offspring_list = offspring_list[:population_size]
-    
-    # Combine the offspring with the current population
-    combined_population = np.vstack((population, offspring_list))
-    combined_fitnesses = np.concatenate((fitnesses, [None] * population_size))  # Placeholder for offspring fitnesses
+# # Truncate the list if we have too many offspring
+# offspring_list = offspring_list[:population_size]
 
-    # Recalculate fitnesses for the combined population
-    # Assuming there is a function calculate_fitnesses that calculates the fitness for each individual
-    combined_fitnesses = evaluate_population(combined_population, dimension)
+# # Combine the offspring with the current population
+# combined_population = np.vstack((population, offspring_list))
+# combined_fitnesses = np.concatenate((fitnesses, [None] * population_size))  # Placeholder for offspring fitnesses
 
-    # Perform round-robin tournament to select the new population
-    new_population, new_fitnesses = _round_robin_tournament(combined_population, combined_fitnesses, q)
+# # Recalculate fitnesses for the combined population
+# # Assuming there is a function calculate_fitnesses that calculates the fitness for each individual
+# combined_fitnesses = evaluate_population(combined_population, dimension)
 
-    return new_population
+# # Perform round-robin tournament to select the new population
+# new_population, new_fitnesses = _round_robin_tournament(combined_population, combined_fitnesses, q)
+
+# return new_population
 
 def age_based_replacement_with_elitism(select_parents, crossover, mutate, population, fitnesses, population_size, mutation_rate, dimension, mutation_strength, evaluate_population):
     '''
@@ -554,7 +554,7 @@ def mu_plus_lambda_replacement(select_parents, crossover, mutate, population, fi
 #
 available_functions = {
     'selection': [
-        tournament_selection,
+        # tournament_selection,
         fps_selection,
         ranking_selection,
         sus_selection,
@@ -562,7 +562,7 @@ available_functions = {
     'crossover': [
         uniform_crossover,
         simple_arithmetic_crossover,
-        blx_alpha_crossover,
+        # blx_alpha_crossover,
     ],
     'mutation': [
         add_perturbation_mutation,
@@ -570,10 +570,10 @@ available_functions = {
         non_uniform_mutation,
     ],
     'replacement': [
-        aged_based_replacement,
-        genitor_replacement,
+        # aged_based_replacement,
+        # genitor_replacement,
         mu_plus_lambda_replacement,
-        age_based_replacement_with_elitism
+        # age_based_replacement_with_elitism
     ],
 }
 

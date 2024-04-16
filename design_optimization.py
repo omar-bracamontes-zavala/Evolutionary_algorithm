@@ -107,5 +107,5 @@ if __name__ == '__main__':
                 'performance_metrics': str(err),
                 })
         print(f'\tFinished in {round(time()-time_start)}s')
-        with open('results.json','w') as json_file:
+        with open('results_mu.json','w') as json_file:
             json.dump(combination_performances,json_file)

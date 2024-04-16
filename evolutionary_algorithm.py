@@ -90,8 +90,8 @@ if __name__=='__main__':
     # Design
     initialize_population = ef.initialize_population
     evaluate_population = ef.evaluate_population
-    select_parents = ef.sus_selection
-    crossover = ef.simple_arithmetic_crossover
+    select_parents = ef.tournament_selection
+    crossover = ef.uniform_crossover
     mutate = ef.uniform_mutation
     replacement = ef.mu_plus_lambda_replacement
     
