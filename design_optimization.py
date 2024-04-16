@@ -92,15 +92,23 @@ if __name__ == '__main__':
 
     design_function_option_combinations = get_design_functions_combinations(available_functions)
     for function_combination in design_function_option_combinations:
-        ## Functions and indexes have to be unpacked
-        design_functions = [element[1] for element in function_combination]
-        design_functions_indexes = [element[0] for element in function_combination]
+        try:
+            ## Functions and indexes have to be unpacked
+            design_functions = [element[1] for element in function_combination]
+            design_functions_indexes = [element[0] for element in function_combination]
 
-        evolutionary_algorithm_args = general_evolutionary_functions + design_functions + parameters
-        performnances = calculate_performance_metrics(evolutionary_algorithm,evolutionary_algorithm_args)
-        combination_performances.append({
-            'combination_indexes':design_functions_indexes,
-            'performance_metrics': performnances,
-            })
+            evolutionary_algorithm_args = general_evolutionary_functions + design_functions + parameters
+            performances = calculate_performance_metrics(evolutionary_algorithm,evolutionary_algorithm_args)
+            combination_performances.append({
+                'combination_indexes':design_functions_indexes,
+                'performance_metrics': performances,
+                })
 
-    print(combination_performances)
+        except Exception as err:
+            combination_performances.append({
+                'combination_indexes':design_functions_indexes,
+                'performance_metrics': str(err),
+                })
+    import json
+    with open('results.json','w') as json_file:
+        json.dump(combination_performances,json_file)
