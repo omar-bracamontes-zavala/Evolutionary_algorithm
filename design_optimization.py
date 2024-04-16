@@ -90,7 +90,7 @@ if __name__ == '__main__':
             ## Functions and indexes have to be unpacked
             design_functions = [element[1] for element in function_combination]
             design_functions_indexes = [element[0] for element in function_combination]
-
+            
             evolutionary_algorithm_args = general_evolutionary_functions + design_functions + parameters
             performances = calculate_performance_metrics(evolutionary_algorithm,evolutionary_algorithm_args)
             combination_performances.append({
