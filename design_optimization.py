@@ -5,6 +5,7 @@ from multiprocess import Pool
 from itertools import product
 from time import time
 import numpy as np
+import json
 
 
 def calculate_performance_metrics(
@@ -84,13 +85,14 @@ if __name__ == '__main__':
 
     combination_performances = []
 
-    design_function_option_combinations = get_design_functions_combinations(available_functions)
-    for function_combination in design_function_option_combinations:
+    design_function_option_combinations = list(get_design_functions_combinations(available_functions))
+    for run_number, function_combination in enumerate(design_function_option_combinations):
+        time_start = time()
         try:
             ## Functions and indexes have to be unpacked
             design_functions = [element[1] for element in function_combination]
             design_functions_indexes = [element[0] for element in function_combination]
-            
+            print(f'{run_number}/{len(design_function_option_combinations)}: {design_functions_indexes}')
             evolutionary_algorithm_args = general_evolutionary_functions + design_functions + parameters
             performances = calculate_performance_metrics(evolutionary_algorithm,evolutionary_algorithm_args)
             combination_performances.append({
@@ -99,10 +101,11 @@ if __name__ == '__main__':
                 })
 
         except Exception as err:
+            print(f'{run_number}/{len(design_function_option_combinations)} failed')
             combination_performances.append({
                 'combination_indexes':design_functions_indexes,
                 'performance_metrics': str(err),
                 })
-    import json
-    with open('results.json','w') as json_file:
-        json.dump(combination_performances,json_file)
+        print(f'\tFinished in {round(time()-time_start)}')
+        with open('results.json','w') as json_file:
+            json.dump(combination_performances,json_file)
