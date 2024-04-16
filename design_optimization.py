@@ -101,11 +101,11 @@ if __name__ == '__main__':
                 })
 
         except Exception as err:
-            print(f'{run_number}/{len(design_function_option_combinations)} failed')
+            print(f'{run_number}/{len(design_function_option_combinations)} failed: {err}')
             combination_performances.append({
                 'combination_indexes':design_functions_indexes,
                 'performance_metrics': str(err),
                 })
-        print(f'\tFinished in {round(time()-time_start)}')
+        print(f'\tFinished in {round(time()-time_start)}s')
         with open('results.json','w') as json_file:
             json.dump(combination_performances,json_file)
