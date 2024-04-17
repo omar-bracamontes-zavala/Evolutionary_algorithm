@@ -1,0 +1,722 @@
+[
+  {
+    "combination_indexes": [0, 0, 0, 0],
+    "performance_metrics": {
+      "MBF": -94.09572030890743,
+      "SR": 0.0,
+      "peak_performance": -98.27293404099574
+    }
+  },
+  {
+    "combination_indexes": [0, 0, 0, 1],
+    "performance_metrics": {
+      "MBF": -97.29803679145641,
+      "SR": 0.0,
+      "peak_performance": -101.58463756990328
+    }
+  },
+  {
+    "combination_indexes": [0, 0, 0, 3],
+    "performance_metrics": {
+      "MBF": -98.82017106866594,
+      "SR": 0.0,
+      "peak_performance": -103.7863627646658
+    }
+  },
+  {
+    "combination_indexes": [0, 0, 1, 0],
+    "performance_metrics": {
+      "MBF": 3023.387358313635,
+      "SR": 0.0,
+      "peak_performance": 2295.690165062307
+    }
+  },
+  {
+    "combination_indexes": [0, 0, 1, 1],
+    "performance_metrics": {
+      "MBF": 1618.0998942276194,
+      "SR": 0.0,
+      "peak_performance": 1245.952331955469
+    }
+  },
+  {
+    "combination_indexes": [0, 0, 1, 3],
+    "performance_metrics": {
+      "MBF": 1475.464666758058,
+      "SR": 0.0,
+      "peak_performance": 1154.1111893174661
+    }
+  },
+  {
+    "combination_indexes": [0, 0, 2, 0],
+    "performance_metrics": {
+      "MBF": -83.42872526095405,
+      "SR": 0.0,
+      "peak_performance": -89.82953913409334
+    }
+  },
+  {
+    "combination_indexes": [0, 0, 2, 1],
+    "performance_metrics": {
+      "MBF": -91.9446444487252,
+      "SR": 0.0,
+      "peak_performance": -97.50381854966231
+    }
+  },
+  {
+    "combination_indexes": [0, 0, 2, 3],
+    "performance_metrics": {
+      "MBF": -94.02909385384548,
+      "SR": 0.0,
+      "peak_performance": -98.04734143326469
+    }
+  },
+  {
+    "combination_indexes": [0, 1, 0, 0],
+    "performance_metrics": {
+      "MBF": -95.09110430502105,
+      "SR": 0.0,
+      "peak_performance": -100.43786579272152
+    }
+  },
+  {
+    "combination_indexes": [0, 1, 0, 1],
+    "performance_metrics": {
+      "MBF": -90.52689142034005,
+      "SR": 0.0,
+      "peak_performance": -98.9721330818327
+    }
+  },
+  {
+    "combination_indexes": [0, 1, 0, 3],
+    "performance_metrics": {
+      "MBF": -100.98466934866158,
+      "SR": 0.0,
+      "peak_performance": -104.47846081020836
+    }
+  },
+  {
+    "combination_indexes": [0, 1, 1, 0],
+    "performance_metrics": {
+      "MBF": 360848100.3859216,
+      "SR": 0.0,
+      "peak_performance": 8731105.92944491
+    }
+  },
+  {
+    "combination_indexes": [0, 1, 1, 1],
+    "performance_metrics": {
+      "MBF": 29286.913506798755,
+      "SR": 0.0,
+      "peak_performance": 21449.554911459647
+    }
+  },
+  {
+    "combination_indexes": [0, 1, 1, 3],
+    "performance_metrics": {
+      "MBF": 277933.20666736667,
+      "SR": 0.0,
+      "peak_performance": 81036.14564912065
+    }
+  },
+  {
+    "combination_indexes": [0, 1, 2, 0],
+    "performance_metrics": {
+      "MBF": 49499.10687876356,
+      "SR": 0.0,
+      "peak_performance": 8700.251535060625
+    }
+  },
+  {
+    "combination_indexes": [0, 1, 2, 1],
+    "performance_metrics": {
+      "MBF": -82.3453869355549,
+      "SR": 0.0,
+      "peak_performance": -88.73888739576537
+    }
+  },
+  {
+    "combination_indexes": [0, 1, 2, 3],
+    "performance_metrics": {
+      "MBF": -5.073445683435807,
+      "SR": 0.0,
+      "peak_performance": -61.947682809507356
+    }
+  },
+  {
+    "combination_indexes": [1, 0, 0, 0],
+    "performance_metrics": {
+      "MBF": 1597.5688274689344,
+      "SR": 0.0,
+      "peak_performance": 127.22747848375086
+    }
+  },
+  {
+    "combination_indexes": [1, 0, 0, 1],
+    "performance_metrics": {
+      "MBF": -71.99382578927523,
+      "SR": 0.0,
+      "peak_performance": -79.1223093075962
+    }
+  },
+  {
+    "combination_indexes": [1, 0, 0, 3],
+    "performance_metrics": {
+      "MBF": -11.735082175521317,
+      "SR": 0.0,
+      "peak_performance": -27.32884998342984
+    }
+  },
+  {
+    "combination_indexes": [1, 0, 1, 0],
+    "performance_metrics": {
+      "MBF": 31976270.94697935,
+      "SR": 0.0,
+      "peak_performance": 6339529.433180706
+    }
+  },
+  {
+    "combination_indexes": [1, 0, 1, 1],
+    "performance_metrics": {
+      "MBF": 18803.70079571572,
+      "SR": 0.0,
+      "peak_performance": 6033.569669697568
+    }
+  },
+  {
+    "combination_indexes": [1, 0, 1, 3],
+    "performance_metrics": {
+      "MBF": 998326.0350415964,
+      "SR": 0.0,
+      "peak_performance": 356682.2840479834
+    }
+  },
+  {
+    "combination_indexes": [1, 0, 2, 0],
+    "performance_metrics": {
+      "MBF": 26604.4545870667,
+      "SR": 0.0,
+      "peak_performance": 9768.126817357857
+    }
+  },
+  {
+    "combination_indexes": [1, 0, 2, 1],
+    "performance_metrics": {
+      "MBF": -71.42514585034738,
+      "SR": 0.0,
+      "peak_performance": -80.86621427170873
+    }
+  },
+  {
+    "combination_indexes": [1, 0, 2, 3],
+    "performance_metrics": {
+      "MBF": 258.5810428107984,
+      "SR": 0.0,
+      "peak_performance": -0.729016062654606
+    }
+  },
+  {
+    "combination_indexes": [1, 1, 0, 0],
+    "performance_metrics": {
+      "MBF": 595513018422.3357,
+      "SR": 0.0,
+      "peak_performance": 9739094326.148064
+    }
+  },
+  {
+    "combination_indexes": [1, 1, 0, 1],
+    "performance_metrics": {
+      "MBF": 1605.2226979131317,
+      "SR": 0.0,
+      "peak_performance": 322.87599352783224
+    }
+  },
+  {
+    "combination_indexes": [1, 1, 0, 3],
+    "performance_metrics": {
+      "MBF": 691782317.6105123,
+      "SR": 0.0,
+      "peak_performance": 28494214.27317418
+    }
+  },
+  {
+    "combination_indexes": [1, 1, 1, 0],
+    "performance_metrics": {
+      "MBF": 6.37660520103707e16,
+      "SR": 0.0,
+      "peak_performance": 9115675454929092.0
+    }
+  },
+  {
+    "combination_indexes": [1, 1, 1, 1],
+    "performance_metrics": {
+      "MBF": 1108138.5073034954,
+      "SR": 0.0,
+      "peak_performance": 194555.04403161013
+    }
+  },
+  {
+    "combination_indexes": [1, 1, 1, 3],
+    "performance_metrics": {
+      "MBF": 10274717241.796696,
+      "SR": 0.0,
+      "peak_performance": 2081992238.890604
+    }
+  },
+  {
+    "combination_indexes": [1, 1, 2, 0],
+    "performance_metrics": {
+      "MBF": 88636291795573.3,
+      "SR": 0.0,
+      "peak_performance": 4169685540196.8877
+    }
+  },
+  {
+    "combination_indexes": [1, 1, 2, 1],
+    "performance_metrics": {
+      "MBF": 12230.148955683244,
+      "SR": 0.0,
+      "peak_performance": 1964.1602358202756
+    }
+  },
+  {
+    "combination_indexes": [1, 1, 2, 3],
+    "performance_metrics": {
+      "MBF": 6252858746.432983,
+      "SR": 0.0,
+      "peak_performance": 389603180.1656815
+    }
+  },
+  {
+    "combination_indexes": [2, 0, 0, 0],
+    "performance_metrics": {
+      "MBF": 1843.6679743322536,
+      "SR": 0.0,
+      "peak_performance": 84.30970535857338
+    }
+  },
+  {
+    "combination_indexes": [2, 0, 0, 1],
+    "performance_metrics": {
+      "MBF": -71.73088215715299,
+      "SR": 0.0,
+      "peak_performance": -81.46679560521092
+    }
+  },
+  {
+    "combination_indexes": [2, 0, 0, 3],
+    "performance_metrics": {
+      "MBF": -7.19963121861492,
+      "SR": 0.0,
+      "peak_performance": -29.6765498619941
+    }
+  },
+  {
+    "combination_indexes": [2, 0, 1, 0],
+    "performance_metrics": {
+      "MBF": 46944463.085966304,
+      "SR": 0.0,
+      "peak_performance": 4376622.748644861
+    }
+  },
+  {
+    "combination_indexes": [2, 0, 1, 1],
+    "performance_metrics": {
+      "MBF": 21735.767409919146,
+      "SR": 0.0,
+      "peak_performance": 9986.778015703721
+    }
+  },
+  {
+    "combination_indexes": [2, 0, 1, 3],
+    "performance_metrics": {
+      "MBF": 1039332.5487366999,
+      "SR": 0.0,
+      "peak_performance": 695213.9282705963
+    }
+  },
+  {
+    "combination_indexes": [2, 0, 2, 0],
+    "performance_metrics": {
+      "MBF": 116146.94343301239,
+      "SR": 0.0,
+      "peak_performance": 6880.091748843481
+    }
+  },
+  {
+    "combination_indexes": [2, 0, 2, 1],
+    "performance_metrics": {
+      "MBF": -72.50303871576726,
+      "SR": 0.0,
+      "peak_performance": -81.04646773212707
+    }
+  },
+  {
+    "combination_indexes": [2, 0, 2, 3],
+    "performance_metrics": {
+      "MBF": 719.2590619857496,
+      "SR": 0.0,
+      "peak_performance": -12.959937950648142
+    }
+  },
+  {
+    "combination_indexes": [2, 1, 0, 0],
+    "performance_metrics": {
+      "MBF": 978110868817.1028,
+      "SR": 0.0,
+      "peak_performance": 32970048473.414158
+    }
+  },
+  {
+    "combination_indexes": [2, 1, 0, 1],
+    "performance_metrics": {
+      "MBF": 5349.737916613621,
+      "SR": 0.0,
+      "peak_performance": 1340.981130685893
+    }
+  },
+  {
+    "combination_indexes": [2, 1, 0, 3],
+    "performance_metrics": {
+      "MBF": 918264336.9898306,
+      "SR": 0.0,
+      "peak_performance": 55531765.62480354
+    }
+  },
+  {
+    "combination_indexes": [2, 1, 1, 0],
+    "performance_metrics": {
+      "MBF": 3.2644722795204056e16,
+      "SR": 0.0,
+      "peak_performance": 3529039450059128.5
+    }
+  },
+  {
+    "combination_indexes": [2, 1, 1, 1],
+    "performance_metrics": {
+      "MBF": 1574507.3144226284,
+      "SR": 0.0,
+      "peak_performance": 540568.2896491105
+    }
+  },
+  {
+    "combination_indexes": [2, 1, 1, 3],
+    "performance_metrics": {
+      "MBF": 18058080874.745487,
+      "SR": 0.0,
+      "peak_performance": 3336556035.6201787
+    }
+  },
+  {
+    "combination_indexes": [2, 1, 2, 0],
+    "performance_metrics": {
+      "MBF": 83998336684803.94,
+      "SR": 0.0,
+      "peak_performance": 8088408285718.617
+    }
+  },
+  {
+    "combination_indexes": [2, 1, 2, 1],
+    "performance_metrics": {
+      "MBF": 16840.523037999064,
+      "SR": 0.0,
+      "peak_performance": 729.7671934402053
+    }
+  },
+  {
+    "combination_indexes": [2, 1, 2, 3],
+    "performance_metrics": {
+      "MBF": 7360790342.468903,
+      "SR": 0.0,
+      "peak_performance": 118494948.25071314
+    }
+  },
+  {
+    "combination_indexes": [3, 0, 0, 0],
+    "performance_metrics": {
+      "MBF": -13.236885385315892,
+      "SR": 0.0,
+      "peak_performance": -26.612945441390313
+    }
+  },
+  {
+    "combination_indexes": [3, 0, 0, 1],
+    "performance_metrics": {
+      "MBF": -31.57055231733856,
+      "SR": 0.0,
+      "peak_performance": -40.109714090941736
+    }
+  },
+  {
+    "combination_indexes": [3, 0, 0, 3],
+    "performance_metrics": {
+      "MBF": -35.130974634455406,
+      "SR": 0.0,
+      "peak_performance": -43.21922592211787
+    }
+  },
+  {
+    "combination_indexes": [3, 0, 1, 0],
+    "performance_metrics": {
+      "MBF": 5473.054636900179,
+      "SR": 0.0,
+      "peak_performance": 3296.3805765060274
+    }
+  },
+  {
+    "combination_indexes": [3, 0, 1, 1],
+    "performance_metrics": {
+      "MBF": 2401.7255871205803,
+      "SR": 0.0,
+      "peak_performance": 1872.2426440209963
+    }
+  },
+  {
+    "combination_indexes": [3, 0, 1, 3],
+    "performance_metrics": {
+      "MBF": 2735.3194977273974,
+      "SR": 0.0,
+      "peak_performance": 1726.9509105926606
+    }
+  },
+  {
+    "combination_indexes": [3, 0, 2, 0],
+    "performance_metrics": {
+      "MBF": -13.950481585548925,
+      "SR": 0.0,
+      "peak_performance": -22.41484501467841
+    }
+  },
+  {
+    "combination_indexes": [3, 0, 2, 1],
+    "performance_metrics": {
+      "MBF": -30.977406133005086,
+      "SR": 0.0,
+      "peak_performance": -38.200959283887
+    }
+  },
+  {
+    "combination_indexes": [3, 0, 2, 3],
+    "performance_metrics": {
+      "MBF": -29.49676956687846,
+      "SR": 0.0,
+      "peak_performance": -38.351884824716834
+    }
+  },
+  {
+    "combination_indexes": [3, 1, 0, 0],
+    "performance_metrics": {
+      "MBF": -9.948817757925744,
+      "SR": 0.0,
+      "peak_performance": -21.497642895614035
+    }
+  },
+  {
+    "combination_indexes": [3, 1, 0, 1],
+    "performance_metrics": {
+      "MBF": -17.766143856113736,
+      "SR": 0.0,
+      "peak_performance": -30.70887798358619
+    }
+  },
+  {
+    "combination_indexes": [3, 1, 0, 3],
+    "performance_metrics": {
+      "MBF": -27.01357922803685,
+      "SR": 0.0,
+      "peak_performance": -38.883161473828245
+    }
+  },
+  {
+    "combination_indexes": [3, 1, 1, 0],
+    "performance_metrics": {
+      "MBF": 1026784.9271767887,
+      "SR": 0.0,
+      "peak_performance": 234345.01990797237
+    }
+  },
+  {
+    "combination_indexes": [3, 1, 1, 1],
+    "performance_metrics": {
+      "MBF": 113839.10218781876,
+      "SR": 0.0,
+      "peak_performance": 62761.73252392193
+    }
+  },
+  {
+    "combination_indexes": [3, 1, 1, 3],
+    "performance_metrics": {
+      "MBF": 117591.3529344695,
+      "SR": 0.0,
+      "peak_performance": 88333.2794443281
+    }
+  },
+  {
+    "combination_indexes": [3, 1, 2, 0],
+    "performance_metrics": {
+      "MBF": 261.4122424440792,
+      "SR": 0.0,
+      "peak_performance": -13.849635289274685
+    }
+  },
+  {
+    "combination_indexes": [3, 1, 2, 1],
+    "performance_metrics": {
+      "MBF": -4.105828622996478,
+      "SR": 0.0,
+      "peak_performance": -35.41610774760156
+    }
+  },
+  {
+    "combination_indexes": [3, 1, 2, 3],
+    "performance_metrics": {
+      "MBF": -24.454230238727114,
+      "SR": 0.0,
+      "peak_performance": -38.086439765116125
+    }
+  },
+  {
+    "combination_indexes": [1, 0, 0, 2],
+    "performance_metrics": {
+      "MBF": -115.64620199367945,
+      "SR": 0.0,
+      "peak_performance": -119.9233544587957
+    }
+  },
+  {
+    "combination_indexes": [1, 0, 1, 2],
+    "performance_metrics": {
+      "MBF": 297.919323931976,
+      "SR": 0.0,
+      "peak_performance": 174.7757576107804
+    }
+  },
+  {
+    "combination_indexes": [1, 0, 2, 2],
+    "performance_metrics": {
+      "MBF": -114.99001201357184,
+      "SR": 0.0,
+      "peak_performance": -119.58849494384954
+    }
+  },
+  {
+    "combination_indexes": [1, 1, 0, 2],
+    "performance_metrics": {
+      "MBF": -112.73101812229267,
+      "SR": 0.0,
+      "peak_performance": -117.21790456673367
+    }
+  },
+  {
+    "combination_indexes": [1, 1, 1, 2],
+    "performance_metrics": {
+      "MBF": 621.3211191156109,
+      "SR": 0.0,
+      "peak_performance": 450.92445509868486
+    }
+  },
+  {
+    "combination_indexes": [1, 1, 2, 2],
+    "performance_metrics": {
+      "MBF": -108.98198412499316,
+      "SR": 0.0,
+      "peak_performance": -112.90177438637832
+    }
+  },
+  {
+    "combination_indexes": [2, 0, 0, 2],
+    "performance_metrics": {
+      "MBF": -114.63143968580502,
+      "SR": 0.0,
+      "peak_performance": -121.45861230868016
+    }
+  },
+  {
+    "combination_indexes": [2, 0, 1, 2],
+    "performance_metrics": {
+      "MBF": 328.50654494410753,
+      "SR": 0.0,
+      "peak_performance": 164.79356095441193
+    }
+  },
+  {
+    "combination_indexes": [2, 0, 2, 2],
+    "performance_metrics": {
+      "MBF": -114.33789883505106,
+      "SR": 0.0,
+      "peak_performance": -119.2432589714732
+    }
+  },
+  {
+    "combination_indexes": [2, 1, 0, 2],
+    "performance_metrics": {
+      "MBF": -112.44673097599585,
+      "SR": 0.0,
+      "peak_performance": -117.03852659052524
+    }
+  },
+  {
+    "combination_indexes": [2, 1, 1, 2],
+    "performance_metrics": {
+      "MBF": 1152.8779883513662,
+      "SR": 0.0,
+      "peak_performance": 707.1190938151311
+    }
+  },
+  {
+    "combination_indexes": [2, 1, 2, 2],
+    "performance_metrics": {
+      "MBF": -109.12201487267666,
+      "SR": 0.0,
+      "peak_performance": -116.22491483417907
+    }
+  },
+  {
+    "combination_indexes": [3, 0, 0, 2],
+    "performance_metrics": {
+      "MBF": -114.02075454896811,
+      "SR": 0.0,
+      "peak_performance": -118.35428346909619
+    }
+  },
+  {
+    "combination_indexes": [3, 0, 1, 2],
+    "performance_metrics": {
+      "MBF": 322.00671760028825,
+      "SR": 0.0,
+      "peak_performance": 145.11662487462223
+    }
+  },
+  {
+    "combination_indexes": [3, 0, 2, 2],
+    "performance_metrics": {
+      "MBF": -114.28440715579669,
+      "SR": 0.0,
+      "peak_performance": -120.23568407301316
+    }
+  },
+  {
+    "combination_indexes": [3, 1, 0, 2],
+    "performance_metrics": {
+      "MBF": -115.28427545356199,
+      "SR": 0.0,
+      "peak_performance": -119.33484651876437
+    }
+  },
+  {
+    "combination_indexes": [3, 1, 1, 2],
+    "performance_metrics": {
+      "MBF": 1044.509217374818,
+      "SR": 0.0,
+      "peak_performance": 616.7120582231411
+    }
+  },
+  {
+    "combination_indexes": [3, 1, 2, 2],
+    "performance_metrics": {
+      "MBF": -113.40611721203578,
+      "SR": 0.0,
+      "peak_performance": -119.4058400245997
+    }
+  }
+]
