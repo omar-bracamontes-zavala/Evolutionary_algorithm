@@ -11,7 +11,7 @@ from time import time
 #
 # Designs
 #
-top_designs = get_merged_tops('results/cleaned_results.json', 3)
+# top_designs = get_merged_tops('results/cleaned_results.json', 3)
 
 
 #
@@ -26,8 +26,8 @@ def generate_parameters_set(default, start_rate=0.5, end_rate=5, step_rate=1.5):
 # mutation_rate_set = generate_parameters_set(0.01)
 #mutation_strength_set =  generate_parameters_set(1.)# this could has an adaptative control   
 
-population_size_set = [50,100,200,300,400]
-max_generations_set = [250,500,750,1000]
+population_size_set = [300]
+max_generations_set = [1000]
 
 # mutation_rate_set = generate_parameters_set(0.01)
 #mutation_strength_set =  generate_parameters_set(1.)# this could has an adaptative control   
@@ -35,13 +35,15 @@ max_generations_set = [250,500,750,1000]
 if __name__ == '__main__':
     initialize_population = ef.initialize_population
     evaluate_population = ef.evaluate_population
-    number_of_particles = 11 # este se barrera despues de tunnear
+    # number_of_particles = 11 # este se barrera despues de tunnear
 
-    number_of_particles = 30
+    number_of_particles = [x for x in range(2,30+1)]
+    population_size = 300
+    max_generations = 1000
     mutation_rate = 0.01
     mutation_strength = 1.
 
-    design_selection = [1, 0, 0, 2]
+    design_selection = [1, 0, 2, 2]
 
     general_evolutionary_functions = [
         fitness,
@@ -51,12 +53,11 @@ if __name__ == '__main__':
     
     design_functions = [available_functions[x][option] for x,option in zip(['selection','crossover','mutation','replacement'], design_selection)]
 
-    parameters_combinations =list(product(population_size_set,max_generations_set))
+
+
     combination_performances = []
-
-    for run_number,combo in enumerate(parameters_combinations):
-        population_size,max_generations = combo
-
+    
+    for number_of_particles in range(2,31):
         parameters = [
             population_size,
             number_of_particles,
@@ -64,25 +65,24 @@ if __name__ == '__main__':
             mutation_rate,
             mutation_strength
         ]
-
         time_start = time()
         try:
 
-            print(f'{run_number}/{len(parameters_combinations)}: population: {population_size}, max_generations: {max_generations}')
+            print(f'Particles: {number_of_particles}')
             evolutionary_algorithm_args = general_evolutionary_functions + design_functions + parameters
-            performances = calculate_performance_metrics(evolutionary_algorithm,evolutionary_algorithm_args)
+            performances = calculate_performance_metrics(evolutionary_algorithm,evolutionary_algorithm_args,sample_size=5)
             combination_performances.append({
-                'parameters':{ 'population': population_size, 'max_generations': max_generations},
+                'number_of_particles':number_of_particles,
                 'performance_metrics': performances,
                 })
 
         except Exception as err:
-            print(f'{run_number}/{len(parameters_combinations)} failed: {err}')
+            print(f'Particles: {number_of_particles}')
             combination_performances.append({
-                'combination_indexes':combo,
+                'number_of_particles':number_of_particles,
                 'performance_metrics': str(err),
                 })
 
         print(f'\tFinished in {round(time()-time_start)}s')
-        with open('results/parameter_tunning_results.json','w') as json_file:
+        with open('results/num_particles_results.json','w') as json_file:
             json.dump(combination_performances,json_file)

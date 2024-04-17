@@ -1,0 +1,138 @@
+[
+  {
+    "parameters": { "population": 50, "max_generations": 250 },
+    "performance_metrics": {
+      "MBF": -107.38948402316426,
+      "SR": 0.0,
+      "peak_performance": -112.40061439530818
+    }
+  },
+  {
+    "parameters": { "population": 50, "max_generations": 500 },
+    "performance_metrics": {
+      "MBF": -111.77923882035097,
+      "SR": 0.0,
+      "peak_performance": -116.16259230683006
+    }
+  },
+  {
+    "parameters": { "population": 50, "max_generations": 750 },
+    "performance_metrics": {
+      "MBF": -114.58446754212007,
+      "SR": 0.0,
+      "peak_performance": -120.91037097648956
+    }
+  },
+  {
+    "parameters": { "population": 50, "max_generations": 1000 },
+    "performance_metrics": {
+      "MBF": -116.44768894518357,
+      "SR": 0.03333333333333333,
+      "peak_performance": -122.15703118041004
+    }
+  },
+  {
+    "parameters": { "population": 100, "max_generations": 250 },
+    "performance_metrics": {
+      "MBF": -110.03043794827104,
+      "SR": 0.0,
+      "peak_performance": -117.04948150755246
+    }
+  },
+  {
+    "parameters": { "population": 100, "max_generations": 500 },
+    "performance_metrics": {
+      "MBF": -115.03179404911671,
+      "SR": 0.0,
+      "peak_performance": -120.6643057989522
+    }
+  },
+  {
+    "parameters": { "population": 100, "max_generations": 750 },
+    "performance_metrics": {
+      "MBF": -117.29474532628824,
+      "SR": 0.0,
+      "peak_performance": -120.51132721280904
+    }
+  },
+  {
+    "parameters": { "population": 100, "max_generations": 1000 },
+    "performance_metrics": {
+      "MBF": -119.35986957337242,
+      "SR": 0.2,
+      "peak_performance": -123.8279520555911
+    }
+  },
+  {
+    "parameters": { "population": 200, "max_generations": 250 },
+    "performance_metrics": {
+      "MBF": -111.85557247967367,
+      "SR": 0.0,
+      "peak_performance": -118.83154527866937
+    }
+  },
+  {
+    "parameters": { "population": 200, "max_generations": 500 },
+    "performance_metrics": {
+      "MBF": -116.8301471617188,
+      "SR": 0.1,
+      "peak_performance": -122.53081792411034
+    }
+  },
+  {
+    "parameters": { "population": 200, "max_generations": 750 },
+    "performance_metrics": {
+      "MBF": -118.10864758218347,
+      "SR": 0.03333333333333333,
+      "peak_performance": -121.88653048401733
+    }
+  },
+  {
+    "parameters": { "population": 200, "max_generations": 1000 },
+    "performance_metrics": {
+      "MBF": -119.35745731367224,
+      "SR": 0.06666666666666667,
+      "peak_performance": -122.39359626531677
+    }
+  },
+  {
+    "parameters": { "population": 300, "max_generations": 250 },
+    "performance_metrics": {
+      "MBF": -113.15673555375363,
+      "SR": 0.0,
+      "peak_performance": -118.75998815820068
+    }
+  },
+  {
+    "parameters": { "population": 300, "max_generations": 500 },
+    "performance_metrics": {
+      "MBF": -117.4757889260428,
+      "SR": 0.0,
+      "peak_performance": -121.45615493240562
+    }
+  },
+  {
+    "parameters": { "population": 300, "max_generations": 750 },
+    "performance_metrics": {
+      "MBF": -118.59488223307422,
+      "SR": 0.0,
+      "peak_performance": -121.80673703889067
+    }
+  },
+  {
+    "parameters": { "population": 300, "max_generations": 1000 },
+    "performance_metrics": {
+      "MBF": -120.39834776997351,
+      "SR": 0.3,
+      "peak_performance": -126.52578646900002
+    }
+  },
+  {
+    "parameters": { "population": 400, "max_generations": 250 },
+    "performance_metrics": {
+      "MBF": -114.35299053786161,
+      "SR": 0.0,
+      "peak_performance": -121.32250585124723
+    }
+  }
+]
