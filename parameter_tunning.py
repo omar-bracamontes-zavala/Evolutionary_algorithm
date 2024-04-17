@@ -71,7 +71,7 @@ if __name__ == '__main__':
             evolutionary_algorithm_args = general_evolutionary_functions + design_functions + parameters
             performances = calculate_performance_metrics(evolutionary_algorithm,evolutionary_algorithm_args)
             combination_performances.append({
-                'parameters':{'mutation_rate':mutation_rate, 'mutation_strength':mutation_strength},
+                'parameters':{ 'population': population_size, 'max_generations': max_generations},
                 'performance_metrics': performances,
                 })
 
