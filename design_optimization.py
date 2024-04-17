@@ -72,16 +72,16 @@ if __name__ == '__main__':
     general_evolutionary_functions = [
         fitness,
         initialize_population,
-        evaluate_population
-        ]
+        evaluate_population,
+    ]
 
     parameters = [
         population_size,
         number_of_particles,
         max_generations,
         mutation_rate,
-        mutation_strength
-        ]
+        mutation_strength,
+    ]
 
     combination_performances = []
 
