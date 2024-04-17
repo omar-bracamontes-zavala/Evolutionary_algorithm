@@ -13,6 +13,65 @@ from time import time
 #
 top_designs = get_merged_tops('results/cleaned_results.json', 3)
 
+
+#
+# Adaptative Control: mutation strength
+# Note: Primero se propone una fuerza de mutacion dependiente de las iteraciones
+# Luego se ajusta con la regla de rechenberg, para esto se necesita calcular el success rate (que el hijo mutadotenga mejor fitness que el padre)
+#
+def time_dependent_mutation_strength(t, T):
+    """
+    Calculate the mutation step size based on the current generation t and the
+    maximum number of generations T.
+
+    t: Current generation.
+    T: Maximum number of generations.
+    return: Mutation step size for the current generation.
+    """
+    return 1 - 0.9 * (t / T) # pag 133
+
+def rechenbergs_success_rule(sigma, ps, c=0.817):
+    """
+    Adjust the mutation step size sigma according to Rechenberg's 1/5 success rule.
+
+    sigma: Current mutation step size.
+    ps: Success rate of the mutations.
+    c: Adjustment factor.
+    return: Adjusted mutation step size.
+    """
+    if ps > 1/5:
+        return sigma / c
+    elif ps < 1/5:
+        return sigma * c
+    else:
+        return sigma # pag 133
+
+def calculate_success_rate(successful_mutations, total_mutations):
+    """
+    Calculate the success rate of mutations.
+
+    successful_mutations: The number of mutations that resulted in an improvement.
+    total_mutations: The total number of mutations applied.
+    return: The success rate of the mutations.
+    """
+    if total_mutations == 0:
+        return 0  # To avoid division by zero
+    return successful_mutations / total_mutations
+
+
+# # Example usage:
+
+# # Assume maximum number of generations T is 100, and we are at generation t = 10
+# T = 100
+# t = 10
+# sigma_t = time_dependent_mutation_step_size(t, T)
+
+# # Assume we measured a success rate ps after some trials, e.g., ps = 0.25
+# ps = 0.25
+# sigma_adjusted = rechenbergs_success_rule(sigma_t, ps)
+
+# sigma_t, sigma_adjusted
+
 #
 # Hyper-parameters
 def generate_parameters_set(default, start_rate=0.5, end_rate=5, step_rate=1.5):
@@ -40,7 +99,7 @@ if __name__ == '__main__':
     mutation_rate = 0.01
     mutation_strength = 1.
 
-    design_selection = [1, 0, 2, 2]
+    design_selection = [1, 0, 0, 2]
 
     general_evolutionary_functions = [
         fitness,
@@ -78,7 +137,7 @@ if __name__ == '__main__':
         except Exception as err:
             print(f'{run_number}/{len(parameters_combinations)} failed: {err}')
             combination_performances.append({
-                'combination_indexes':design_functions_indexes,
+                'combination_indexes':combo,
                 'performance_metrics': str(err),
                 })
 
